@@ -141,6 +141,7 @@ class Order extends Model
             'pending' => 'warning',
             'confirmed' => 'info',
             'completed' => 'success',
+            'delivered' => 'success',
             'cancelled' => 'danger',
             default => 'secondary'
         };

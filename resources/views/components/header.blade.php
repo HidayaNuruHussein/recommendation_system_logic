@@ -1,9 +1,3 @@
-{{--
-SOURCE CODE OWNER: HAGAI HAROLD NGOBEY
-hngobey@gmail.com | +255 765 384 905
-Provided to assist students. Students may study, modify, and reuse it
-for any non-commercial educational purpose. See LICENSE.md.
---}}
 <!-- Header Component -->
 @php
     $headerSettings = \App\Models\SiteSetting::where('group', 'header')->pluck('value', 'key');
@@ -34,8 +28,8 @@ for any non-commercial educational purpose. See LICENSE.md.
                     <img src="{{ isset($headerSettings['header_logo']) ? asset($headerSettings['header_logo']) : asset('img/logo.png') }}" alt="Kids Shop Logo" class="logo-img">
                 </div>
                 <div class="logo-text">
-                    <span class="school-name">{{ $headerSettings['header_school_name'] ?? 'KidsStore' }}</span>
-                    <span class="school-subtitle">{{ $headerSettings['header_school_subtitle'] ?? 'Cute .Fun . Safe for Every Child' }}</span>
+                    <span class="school-name">{{ $headerSettings['header_school_name'] ?? 'electronicsStore' }}</span>
+                    <span class="school-subtitle">{{ $headerSettings['header_school_subtitle'] ?? 'Cute .Fun . Safe for use' }}</span>
                 </div>
             </a>
 

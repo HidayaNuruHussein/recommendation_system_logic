@@ -1,9 +1,3 @@
-{{--
-SOURCE CODE OWNER: HAGAI HAROLD NGOBEY
-hngobey@gmail.com | +255 765 384 905
-Provided to assist students. Students may study, modify, and reuse it
-for any non-commercial educational purpose. See LICENSE.md.
---}}
 @php
     $headerSettings = \App\Models\SiteSetting::where('group', 'header')->pluck('value', 'key');
     $sidebarBrandName = $headerSettings['header_school_name'] ?? config('app.name', 'Kids Shop');

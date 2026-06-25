@@ -9,6 +9,8 @@ class ProductMedia extends Model
 {
     use HasFactory;
 
+    protected $table = 'product_media';
+
     protected $fillable = [
         'product_id',
         'type',

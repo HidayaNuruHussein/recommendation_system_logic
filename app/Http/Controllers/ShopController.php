@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\ProductView;
+use App\Models\Rating;
+use App\Services\Recommendation\HybridRecommendationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Product;
-use App\Models\Category;
-use App\Models\Rating;
-use App\Models\ProductView;
 use Illuminate\Support\Facades\DB;
 
 class ShopController extends Controller
 {
     private const MIN_VIEW_SECONDS_TO_RECORD = 10;
+
     private const FEATURE_REFRESH_HOURS = 2;
 
     public function index(Request $request)
@@ -23,25 +25,25 @@ class ShopController extends Controller
         $query->where('stock', '>', 0);
 
         // Search
-        if ($request->has('search') && !empty($request->search)) {
+        if ($request->has('search') && ! empty($request->search)) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', '%' . $search . '%')
-                  ->orWhere('slug', 'like', '%' . $search . '%')
-                  ->orWhereHas('description', function($desc) use ($search) {
-                      $desc->where('description', 'like', '%' . $search . '%')
-                          ->orWhere('specifications', 'like', '%' . $search . '%')
-                          ->orWhere('details', 'like', '%' . $search . '%');
-                  });
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%'.$search.'%')
+                    ->orWhere('slug', 'like', '%'.$search.'%')
+                    ->orWhereHas('description', function ($desc) use ($search) {
+                        $desc->where('description', 'like', '%'.$search.'%')
+                            ->orWhere('specifications', 'like', '%'.$search.'%')
+                            ->orWhere('details', 'like', '%'.$search.'%');
+                    });
             });
         }
         // Category filter
-        if ($request->has('category') && !empty($request->category)) {
-            $query->where('category_id', (int)$request->category);
+        if ($request->has('category') && ! empty($request->category)) {
+            $query->where('category_id', (int) $request->category);
         }
 
         // Rating filter
-        if ($request->has('rating') && !empty($request->rating)) {
+        if ($request->has('rating') && ! empty($request->rating)) {
             $query->where('rate', '>=', $request->rating);
         }
 
@@ -75,17 +77,17 @@ class ShopController extends Controller
                 $priorityMap[$id] = 1;
             }
             foreach ($topRatedIds as $id) {
-                if (!isset($priorityMap[$id])) {
+                if (! isset($priorityMap[$id])) {
                     $priorityMap[$id] = 2;
                 }
             }
             foreach ($topViewedIds as $id) {
-                if (!isset($priorityMap[$id])) {
+                if (! isset($priorityMap[$id])) {
                     $priorityMap[$id] = 3;
                 }
             }
 
-            if (!empty($priorityMap)) {
+            if (! empty($priorityMap)) {
                 $priorityCases = collect($priorityMap)
                     ->map(fn ($priority, $id) => "WHEN id = {$id} THEN {$priority}")
                     ->implode(' ');
@@ -97,8 +99,8 @@ class ShopController extends Controller
                 ->orderByDesc('views')
                 ->orderByDesc('created_at');
 
-            $featuredRows = [
-                'row1_title' => 'New Arrivals',
+$featuredRows = [
+                'row1_title' => 'All Products',
                 'row1' => $this->fetchProductsByOrderedIds($newestIds, 12),
                 'row2_title' => 'Top Rated Products',
                 'row2' => $this->fetchProductsByOrderedIds($topRatedIds, 12),
@@ -112,34 +114,34 @@ class ShopController extends Controller
                 ->values()
                 ->all();
 
-            if (!empty($featuredProductIds)) {
+            if (! empty($featuredProductIds)) {
                 $query->whereNotIn('id', $featuredProductIds);
             }
         }
 
         $products = $query->paginate(24)->withQueryString();
-        if (!empty($featuredRows) && $products->isEmpty()) {
+        if (! empty($featuredRows) && $products->isEmpty()) {
             $fallbackQuery = Product::with(['category', 'media', 'description'])
                 ->where('stock', '>', 0);
 
-            if ($request->has('search') && !empty($request->search)) {
+            if ($request->has('search') && ! empty($request->search)) {
                 $search = $request->search;
-                $fallbackQuery->where(function($q) use ($search) {
-                    $q->where('name', 'like', '%' . $search . '%')
-                        ->orWhere('slug', 'like', '%' . $search . '%')
-                        ->orWhereHas('description', function($desc) use ($search) {
-                            $desc->where('description', 'like', '%' . $search . '%')
-                                ->orWhere('specifications', 'like', '%' . $search . '%')
-                                ->orWhere('details', 'like', '%' . $search . '%');
+                $fallbackQuery->where(function ($q) use ($search) {
+                    $q->where('name', 'like', '%'.$search.'%')
+                        ->orWhere('slug', 'like', '%'.$search.'%')
+                        ->orWhereHas('description', function ($desc) use ($search) {
+                            $desc->where('description', 'like', '%'.$search.'%')
+                                ->orWhere('specifications', 'like', '%'.$search.'%')
+                                ->orWhere('details', 'like', '%'.$search.'%');
                         });
                 });
             }
 
-            if ($request->has('category') && !empty($request->category)) {
-                $fallbackQuery->where('category_id', (int)$request->category);
+            if ($request->has('category') && ! empty($request->category)) {
+                $fallbackQuery->where('category_id', (int) $request->category);
             }
 
-            if ($request->has('rating') && !empty($request->rating)) {
+            if ($request->has('rating') && ! empty($request->rating)) {
                 $fallbackQuery->where('rate', '>=', $request->rating);
             }
 
@@ -155,32 +157,84 @@ class ShopController extends Controller
             $query->where('stock', '>', 0);
         }])->orderBy('name')->get();
 
-        return view('shop', compact('products', 'categories', 'featuredRows'));
+        $aiRecommendations = [];
+        $hasOrderHistory = false;
+
+        if (Auth::check()) {
+            try {
+                $ai = app(HybridRecommendationService::class);
+                $userHistory = $this->getUserInteractionProductIds(8);
+                if (! empty($userHistory)) {
+                    $aiRecommendations = $ai->recommendForCart($userHistory, 8);
+                }
+                if (empty($aiRecommendations)) {
+                    $aiRecommendations = $ai->fallbackGeneral(8);
+                }
+                $hasOrderHistory = \Illuminate\Support\Facades\DB::table('orders')
+                    ->where('user_id', Auth::id())
+                    ->whereIn('status', ['completed', 'delivered'])
+                    ->exists();
+            } catch (\Throwable $e) {
+                \Log::debug('Recommendation service error on shop page', ['error' => $e->getMessage()]);
+            }
+        }
+
+        return view('shop', compact('products', 'categories', 'featuredRows', 'aiRecommendations', 'hasOrderHistory'));
     }
 
     public function show(string $publicId, string $slug)
     {
         $product = $this->resolveShopProduct($publicId, ['category', 'media', 'description', 'ratings.user']);
-
         if ($slug !== $product->slug) {
             return redirect()->route('shop.show', [
                 'public_id' => $product->public_id,
                 'slug' => $product->slug,
             ], 301);
         }
-
         // Increment view count
         $product->increment('views');
 
-        // Get related products from same category
+        // Get related products from same category (basic fallback)
         $relatedProducts = Product::with(['category', 'media', 'description'])
-                                ->where('category_id', $product->category_id)
-                                ->where('id', '!=', $product->id)
-                                ->where('stock', '>', 0)
-                                ->take(4)
-                                ->get();
+            ->where('category_id', $product->category_id)
+            ->where('id', '!=', $product->id)
+            ->where('stock', '>', 0)
+            ->take(4)
+            ->get();
 
-        return view('shop.show', compact('product', 'relatedProducts'));
+        // Get complementary products (frequently bought together)
+        $complementaryProducts = collect();
+
+        // Recommendations: Apriori + complementary products for logged-in users with orders
+        $aiRecommendations = [];
+        $hasOrderHistory = false;
+        try {
+            $ai = app(HybridRecommendationService::class);
+            $userHistory = $this->getUserInteractionProductIds(8);
+            if (! empty($userHistory)) {
+                $aiRecommendations = $ai->recommendForCart($userHistory, 8);
+            }
+            if (empty($aiRecommendations)) {
+                $aiRecommendations = $ai->recommend($product->id, 8);
+            }
+            if (empty($aiRecommendations)) {
+                $aiRecommendations = $ai->fallbackGeneral(8);
+            }
+            // For logged-in users with completed orders, get complementary products
+            if (Auth::check()) {
+                $hasOrderHistory = \Illuminate\Support\Facades\DB::table('orders')
+                    ->where('user_id', Auth::id())
+                    ->whereIn('status', ['completed', 'delivered'])
+                    ->exists();
+                if ($hasOrderHistory) {
+                    $complementaryProducts = $product->complementaryProducts(4);
+                }
+            }
+        } catch (\Throwable $e) {
+            \Log::debug('Recommendation service error on product page', ['error' => $e->getMessage()]);
+        }
+
+        return view('shop.show', compact('product', 'relatedProducts', 'aiRecommendations', 'hasOrderHistory', 'complementaryProducts'));
     }
 
     public function trackViewActivity(Request $request, string $publicId, string $slug)
@@ -205,7 +259,7 @@ class ShopController extends Controller
             ->latest()
             ->first();
 
-        if (!$existing) {
+        if (! $existing) {
             ProductView::create([
                 'product_id' => $product->id,
                 'user_id' => Auth::id(),
@@ -235,12 +289,12 @@ class ShopController extends Controller
         }]);
 
         // Search
-        if ($request->has('search') && !empty($request->search)) {
+        if ($request->has('search') && ! empty($request->search)) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', '%' . $search . '%')
-                  ->orWhere('slug', 'like', '%' . $search . '%')
-                  ->orWhere('description', 'like', '%' . $search . '%');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%'.$search.'%')
+                    ->orWhere('slug', 'like', '%'.$search.'%')
+                    ->orWhere('description', 'like', '%'.$search.'%');
             });
         }
 
@@ -254,25 +308,25 @@ class ShopController extends Controller
         $category = Category::where('slug', $slug)->firstOrFail();
 
         $query = Product::with(['category', 'media', 'description'])
-                       ->where('category_id', $category->id)
-                       ->where('stock', '>', 0);
+            ->where('category_id', $category->id)
+            ->where('stock', '>', 0);
 
         // Search within category
-        if ($request->has('search') && !empty($request->search)) {
+        if ($request->has('search') && ! empty($request->search)) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', '%' . $search . '%')
-                  ->orWhere('slug', 'like', '%' . $search . '%')
-                  ->orWhereHas('description', function($desc) use ($search) {
-                      $desc->where('description', 'like', '%' . $search . '%')
-                          ->orWhere('specifications', 'like', '%' . $search . '%')
-                          ->orWhere('details', 'like', '%' . $search . '%');
-                  });
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%'.$search.'%')
+                    ->orWhere('slug', 'like', '%'.$search.'%')
+                    ->orWhereHas('description', function ($desc) use ($search) {
+                        $desc->where('description', 'like', '%'.$search.'%')
+                            ->orWhere('specifications', 'like', '%'.$search.'%')
+                            ->orWhere('details', 'like', '%'.$search.'%');
+                    });
             });
         }
 
         // Rating filter
-        if ($request->has('rating') && !empty($request->rating)) {
+        if ($request->has('rating') && ! empty($request->rating)) {
             $query->where('rate', '>=', $request->rating);
         }
 
@@ -309,10 +363,11 @@ class ShopController extends Controller
             'review' => 'nullable|string|max:1000',
         ]);
 
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             if ($request->expectsJson()) {
                 return response()->json(['success' => false, 'message' => 'You must be logged in to rate products.'], 401);
             }
+
             return redirect()->back()->with('error', 'You must be logged in to rate products.');
         }
 
@@ -320,8 +375,8 @@ class ShopController extends Controller
 
         // Check if user already rated this product
         $existingRating = Rating::where('user_id', Auth::id())
-                                ->where('product_id', $product->id)
-                                ->first();
+            ->where('product_id', $product->id)
+            ->first();
 
         if ($existingRating) {
             $existingRating->update([
@@ -351,7 +406,65 @@ class ShopController extends Controller
     private function resolveShopProduct(string $publicId, array $with = [], array $select = ['*']): Product
     {
         $query = Product::query()->with($with)->select($select);
+
         return $query->where('public_id', $publicId)->firstOrFail();
+    }
+
+    /**
+     * Get product IDs the user has interacted with (recently viewed).
+     * Used to build personalized AI recommendations on the shop home.
+     */
+    private function getUserInteractionProductIds(int $limit = 8): array
+    {
+        $userId = Auth::id();
+        $sessionId = session()->getId();
+        // 1) Authenticated user order history
+        if ($userId) {
+            $purchased = DB::table('order_items')
+                ->join('orders', 'orders.id', '=', 'order_items.order_id')
+                ->where('orders.user_id', $userId)
+                ->whereIn('orders.status', ['completed', 'delivered'])
+                ->orderByDesc('orders.created_at')
+                ->limit($limit)
+                ->pluck('order_items.product_id')
+                ->unique()
+                ->values()
+                ->all();
+            if (! empty($purchased)) {
+                return $purchased;
+            }
+        }
+        // 2) Recently viewed products (by user or session)
+        $viewQuery = ProductView::query()
+            ->select('product_id')
+            ->orderByDesc('last_activity_at')
+            ->limit($limit)
+            ->distinct();
+        if ($userId) {
+            $viewQuery->where(function ($q) use ($userId, $sessionId) {
+                $q->where('user_id', $userId)->orWhere('session_id', $sessionId);
+            });
+        } else {
+            $viewQuery->where('session_id', $sessionId);
+        }
+        $viewed = $viewQuery->pluck('product_id')->unique()->values()->all();
+        if (! empty($viewed)) {
+            return $viewed;
+        }
+        // 3) Cart items (still useful even if not purchased)
+        $cartQuery = DB::table('cart_items')
+            ->join('carts', 'carts.id', '=', 'cart_items.cart_id')
+            ->orderByDesc('cart_items.created_at')
+            ->limit($limit)
+            ->distinct();
+        if ($userId) {
+            $cartQuery->where('carts.user_id', $userId);
+        } else {
+            $cartQuery->where('carts.session_id', $sessionId);
+        }
+        $cart = $cartQuery->pluck('cart_items.product_id')->unique()->values()->all();
+
+        return $cart;
     }
 
     private function topRatedProductIds(int $limit = 16): array
@@ -371,7 +484,7 @@ class ShopController extends Controller
         $query = Product::query()
             ->leftJoin('product_views', 'products.id', '=', 'product_views.product_id')
             ->where('products.stock', '>', 0)
-            ->when(!empty($excludeIds), function ($q) use ($excludeIds) {
+            ->when(! empty($excludeIds), function ($q) use ($excludeIds) {
                 $q->whereNotIn('products.id', $excludeIds);
             })
             ->groupBy('products.id', 'products.views', 'products.created_at')
@@ -391,10 +504,10 @@ class ShopController extends Controller
         $max = max(count($left), count($right));
 
         for ($i = 0; $i < $max; $i++) {
-            if (isset($left[$i]) && !in_array($left[$i], $result, true)) {
+            if (isset($left[$i]) && ! in_array($left[$i], $result, true)) {
                 $result[] = $left[$i];
             }
-            if (isset($right[$i]) && !in_array($right[$i], $result, true)) {
+            if (isset($right[$i]) && ! in_array($right[$i], $result, true)) {
                 $result[] = $right[$i];
             }
             if (count($result) >= $limit) {
@@ -410,11 +523,12 @@ class ShopController extends Controller
         $excludeIds = array_values(array_unique(array_map('intval', $excludeIds)));
         $query = Product::where('stock', '>', 0)->orderByDesc('created_at');
 
-        if (!empty($excludeIds)) {
+        if (! empty($excludeIds)) {
             $query->whereNotIn('id', $excludeIds);
         }
 
         $candidateIds = $query->limit(max($limit * 6, 96))->pluck('id')->all();
+
         return array_slice($this->stableShuffleIds($candidateIds, 'discover_more'), 0, $limit);
     }
 
@@ -445,11 +559,12 @@ class ShopController extends Controller
         }
 
         $window = (int) floor(now()->timestamp / (self::FEATURE_REFRESH_HOURS * 3600));
-        $seed = $bucket . ':' . $window;
+        $seed = $bucket.':'.$window;
 
         usort($ids, function ($a, $b) use ($seed) {
-            $ha = crc32($seed . ':' . $a);
-            $hb = crc32($seed . ':' . $b);
+            $ha = crc32($seed.':'.$a);
+            $hb = crc32($seed.':'.$b);
+
             return $ha <=> $hb;
         });
 

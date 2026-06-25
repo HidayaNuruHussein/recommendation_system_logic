@@ -10,7 +10,7 @@ This project is designed mainly for learning, demonstration, and non-commercial 
 - Product search, filtering, sorting, and category browsing
 - Customer registration, login, email verification, and password reset
 - Role-based access for administrators, sellers, and customers
-- Shopping cart and checkout
+- Shopping cart
 - Customer order history and order management
 - Product, stock, category, and media management
 - Seller dashboard with sales and stock statistics
@@ -477,15 +477,3 @@ For real email verification and password-reset messages, configure SMTP values i
 - Run Laravel optimization commands when deploying.
 - Do not commit the `.env` file to source control.
 
-## Educational License
-
-This application is released under the [Education-Only Non-Commercial License](LICENSE.md). Commercial use is prohibited without prior written permission from the developer.
-
-Copyright © 2026 HAGAI HAROLD NGOBEY  
-Role: Source Code Owner  
-Email: hngobey@gmail.com  
-Phone: +255 765 384 905
-
-Students may study, modify, adapt, share, and reuse this source code for non-commercial educational purposes. Original source-code ownership remains with HAGAI HAROLD NGOBEY.
-
-Laravel framework components remain subject to their original MIT license.

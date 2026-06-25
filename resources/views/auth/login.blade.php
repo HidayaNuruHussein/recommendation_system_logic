@@ -23,9 +23,9 @@ for any non-commercial educational purpose. See LICENSE.md.
                                 <div class="auth-login-brand">
                                     <img
                                         src="{{ isset($headerSettings['header_logo']) ? asset($headerSettings['header_logo']) : asset('img/logo.png') }}"
-                                        alt="{{ $headerSettings['header_school_name'] ?? 'KidsStore' }} Logo">
+                                        alt="{{ $headerSettings['header_school_name'] ?? 'Electronic' }} Logo">
                                     <span>
-                                        <strong>{{ $headerSettings['header_school_name'] ?? 'KidsStore' }}</strong>
+                                        <strong>{{ $headerSettings['header_school_name'] ?? 'Electronic' }}</strong>
                                         <small>{{ $headerSettings['header_school_subtitle'] ?? 'Premium Kids Shopping Experience' }}</small>
                                     </span>
                                 </div>
@@ -34,20 +34,20 @@ for any non-commercial educational purpose. See LICENSE.md.
 
                                 <div class="auth-login-copy">
                                     <h1>Welcome Back</h1>
-                                    <p>Sign in to continue with secure access to your KidsStore services.</p>
+                                    <!-- <p>Sign in to continue with secure access to your KidsStore services.</p> -->
                                 </div>
 
-                                <div class="auth-login-guide">
+                                <!-- <div class="auth-login-guide">
                                     <h3>How to fill this form</h3>
                                     <ul>
                                         <li>Use your registered email address and password.</li>
                                         <li>Keep your account active with protected sessions.</li>
                                         <li>Reset your password quickly if you lose access.</li>
                                     </ul>
-                                </div>
+                                </div> -->
 
                                 <div class="auth-login-watermark" aria-hidden="true">
-                                    <i class="bi bi-shield-lock"></i>
+                                    <!-- <i class="bi bi-shield-lock"></i> -->
                                 </div>
                             </aside>
                         </div>

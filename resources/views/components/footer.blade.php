@@ -1,10 +1,4 @@
-{{--
-SOURCE CODE OWNER: HAGAI HAROLD NGOBEY
-hngobey@gmail.com | +255 765 384 905
-Provided to assist students. Students may study, modify, and reuse it
-for any non-commercial educational purpose. See LICENSE.md.
---}}
-<!-- Footer Component - Kids Shop Edition -->
+<!-- Footer Component - electronics Shop Edition -->
 @php
     $footerSettings = \App\Models\SiteSetting::where('group', 'footer')->pluck('value', 'key');
 @endphp
@@ -18,8 +12,8 @@ for any non-commercial educational purpose. See LICENSE.md.
             <div class="footer-brand">
                 <div class="footer-logo">
                     <div class="footer-logo-text">
-                        <h3 class="footer-school-name">{{ $footerSettings['footer_brand_name'] ?? 'myKidsShop365' }}</h3>
-                        <p class="footer-school-subtitle">{{ $footerSettings['footer_brand_subtitle'] ?? '“Everything Cute for Little Ones”' }}</p>
+                        <h3 class="footer-school-name">{{ $footerSettings['footer_brand_name'] ?? 'electronics365' }}</h3>
+                        <p class="footer-school-subtitle">{{ $footerSettings['footer_brand_subtitle'] ?? '“Everything good for better use”' }}</p>
                     </div>
                 </div>
 

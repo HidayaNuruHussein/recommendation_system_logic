@@ -276,3 +276,113 @@ document.addEventListener('DOMContentLoaded', function () {
         resizeTimer = setTimeout(applyFeaturedRowsWindowing, 120);
     });
 });
+
+/* ============================================
+   AI RECOMMENDATIONS - AJAX LOADER
+   ============================================ */
+(function () {
+    'use strict';
+
+    var AIEndpoints = {
+        forProduct: '/api/recommendations/product',
+    };
+
+    function getCsrfToken() {
+        var meta = document.querySelector('meta[name="csrf-token"]');
+        return meta ? meta.getAttribute('content') : '';
+    }
+
+    function showLoader(section) {
+        if (!section) return;
+        var loader = document.createElement('div');
+        loader.className = 'ai-section-loader';
+        loader.innerHTML = '<div class="spinner"></div>';
+        section.appendChild(loader);
+    }
+
+    function hideLoader(section) {
+        if (!section) return;
+        var loader = section.querySelector('.ai-section-loader');
+        if (loader) loader.remove();
+    }
+
+    function renderProductCard(item, showAiBadge) {
+        var p = item.product || item;
+        var confidence = item.confidence || 0;
+        var confidencePercent = confidence > 0 ? Math.round(confidence * 100) : 0;
+        var imageUrl = (p.thumbnail || p.image) ? '/storage/' + (p.thumbnail || p.image) : '/img/logo.png';
+        var showUrl = p.public_id && p.slug
+            ? '/shop/' + p.public_id + '/' + p.slug
+            : (p.url || '#');
+
+        var aiBadgeHtml = '';
+        if (showAiBadge) {
+            aiBadgeHtml = '<span class="product-badge badge-ai">' +
+                '<i class="bi bi-stars"></i> AI Pick' +
+                (confidencePercent > 0 ? ' <span class="badge-confidence">' + confidencePercent + '%</span>' : '') +
+                '</span>';
+        }
+
+        return '<article class="product-card ai-product-card ' + (showAiBadge ? 'has-ai-badge' : '') + '">' +
+            '<div class="product-image">' +
+                '<a href="' + showUrl + '">' +
+                    '<img src="' + imageUrl + '" alt="' + (p.name || '') + '" loading="lazy">' +
+                '</a>' +
+                '<div class="product-badges">' + aiBadgeHtml + '</div>' +
+            '</div>' +
+            '<div class="product-info">' +
+                '<h3 class="product-title"><a href="' + showUrl + '">' + (p.name || '') + '</a></h3>' +
+                '<div class="product-prices">' +
+                    '<span class="product-price">Tsh ' + new Intl.NumberFormat('en-US').format(p.new_price || 0) + '</span>' +
+                '</div>' +
+            '</div>' +
+        '</article>';
+    }
+
+    /**
+     * Lazy load AI recommendations for the current product page.
+     */
+    function loadProductRecommendations() {
+        var section = document.getElementById('ai-related-section');
+        if (!section) return;
+
+        // Only AJAX if section is empty (i.e. server didn't render any)
+        if (section.querySelectorAll('.ai-product-card').length > 0) return;
+
+        var productId = section.getAttribute('data-product-id');
+        if (!productId) return;
+
+        showLoader(section);
+        fetch(AIEndpoints.forProduct + '/' + productId, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': getCsrfToken(),
+            },
+            credentials: 'same-origin',
+        })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+            hideLoader(section);
+            if (!data || !data.recommendations) return;
+            var grid = section.querySelector('.ai-products-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            (data.recommendations || []).forEach(function (rec) {
+                grid.insertAdjacentHTML('beforeend', renderProductCard(rec, true));
+            });
+        })
+        .catch(function () {
+            hideLoader(section);
+        });
+    }
+
+    // Initialize on DOM ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function () {
+            loadProductRecommendations();
+        });
+    } else {
+        loadProductRecommendations();
+    }
+})();

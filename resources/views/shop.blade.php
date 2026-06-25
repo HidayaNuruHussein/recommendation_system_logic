@@ -1,12 +1,6 @@
-{{--
-SOURCE CODE OWNER: HAGAI HAROLD NGOBEY
-hngobey@gmail.com | +255 765 384 905
-Provided to assist students. Students may study, modify, and reuse it
-for any non-commercial educational purpose. See LICENSE.md.
---}}
 @extends('layouts.app')
 
-@section('title', 'Shop - KidsStore')
+@section('title', 'Shop - elcectronicStore')
 
 @section('css')
 <link rel="stylesheet" href="{{ asset('css/shop.css') }}">
@@ -77,6 +71,31 @@ for any non-commercial educational purpose. See LICENSE.md.
 <!-- Controls Bar -->
 <div class="controls-bar" style="display: none;">
 </div>
+<!-- Product Recommendations -->
+    @if(Auth::check() && !empty($aiRecommendations) && count($aiRecommendations) > 0)
+        <section class="mb-4 ai-recommendations-section featured-row-panel" id="ai-recommendations-section">
+            <h2 class="h5 fw-bold mb-0 featured-row-title">
+                <span>Recommended Products</span>
+            </h2>
+            <div class="products-grid ai-products-grid">
+                @foreach($aiRecommendations as $rec)
+                    @php
+                        $aiProduct = $rec['product'] ?? null;
+                    @endphp
+                    @if($aiProduct)
+                        @include('partials.ai-product-card', [
+                            'product' => $aiProduct,
+                            'showAiBadge' => false,
+                            'confidence' => $rec['confidence'] ?? 0,
+                        ])
+                    @endif
+                @endforeach
+            </div>
+            <div class="mobile-scroll-indicator" aria-hidden="true">
+                <span class="mobile-scroll-thumb"></span>
+            </div>
+        </section>
+    @endif
 
     <!-- Products Grid -->
     @if(!$hasActiveFilter && !empty($featuredRows))
@@ -264,9 +283,9 @@ for any non-commercial educational purpose. See LICENSE.md.
     <div id="shop-scroll-sentinel" style="height: 1px;"></div>
 
 </main>
+@endsection
 
 @section('scripts')
 <script src="{{ asset('js/shop.js') }}"></script>
-@endsection
-
+<script src="{{ asset('js/ai-recommendations.js') }}"></script>
 @endsection

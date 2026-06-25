@@ -65,12 +65,12 @@ This limitation reduces user engagement, affects customer satisfaction, and may 
 
 OBJECTIVES
 Main Objective:
-•	To design and implement a web-based clothing e-commerce system integrated with AI for personalized product recommendations.
+•	To design and implement a web-based e-commerce system integrated with product recommendations using php logic
 Specific Objectives:
 •	To apply association rule mining algorithms (Apriori) to analyze customer purchasing behavior.
-•	To design and develop an AI-based recommendation system that provides real-time personalized product suggestions.
+•	To design and develop an recommendation system that provides real-time personalized product suggestions using php logic
 •	To design and implement a structured database for storing user, product, and transaction data.
-•	To develop a web-based e-commerce platform for selling clothing products.
+•	To develop a web-based e-commerce platform for selling  products.
 
 
 

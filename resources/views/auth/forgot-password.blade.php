@@ -34,21 +34,21 @@ for any non-commercial educational purpose. See LICENSE.md.
 
                                 <div class="auth-login-copy">
                                     <h1>Forgot Password</h1>
-                                    <p>Enter your registered email address and we will send a secure password reset link.</p>
+                                    <!-- <p>Enter your registered email address and we will send a secure password reset link.</p> -->
                                 </div>
 
-                                <div class="auth-login-guide">
+                                <!-- <div class="auth-login-guide">
                                     <h3>How this works</h3>
                                     <ul>
                                         <li>Enter the email address linked to your account.</li>
                                         <li>The system verifies whether the account exists.</li>
                                         <li>If valid, a reset link is sent to the same email.</li>
                                     </ul>
-                                </div>
+                                </div> -->
 
-                                <div class="auth-login-watermark" aria-hidden="true">
+                                <!-- <div class="auth-login-watermark" aria-hidden="true">
                                     <i class="bi bi-key"></i>
-                                </div>
+                                </div> -->
                             </aside>
                         </div>
 

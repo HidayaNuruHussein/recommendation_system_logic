@@ -1,12 +1,6 @@
-{{--
-SOURCE CODE OWNER: HAGAI HAROLD NGOBEY
-hngobey@gmail.com | +255 765 384 905
-Provided to assist students. Students may study, modify, and reuse it
-for any non-commercial educational purpose. See LICENSE.md.
---}}
 @extends('layouts.app')
 
-@section('title', $product->name . ' - KidsStore')
+@section('title', $product->name . ' - electronicStore')
 
 @section('css')
     <link rel="stylesheet" href="{{ asset('css/shop.css') }}">
@@ -345,10 +339,104 @@ for any non-commercial educational purpose. See LICENSE.md.
             </div>
         </div>
 
-        <!-- Related Products -->
+        <!-- Frequently Bought Together (Complementary Products) -->
+        @if ($complementaryProducts->count() > 0)
+            <section class="related-products complementary-products-section">
+                <h2 class="related-title">Frequently Bought Together</h2>
+                <div class="products-grid">
+                    @foreach ($complementaryProducts as $compProduct)
+                        <article class="product-card">
+                            <div class="product-image">
+                                <a href="{{ route('shop.show', ['public_id' => $compProduct->public_id, 'slug' => $compProduct->slug]) }}" class="text-decoration-none">
+                                    <img src="{{ $compProduct->thumbnail ? asset('storage/' . $compProduct->thumbnail) : asset('img/logo.png') }}"
+                                        alt="{{ $compProduct->name }}" loading="lazy">
+                                </a>
+                                <div class="product-badges">
+                                    @if($compProduct->created_at->diffInDays(now()) <= 7)
+                                        <span class="product-badge badge-new">New</span>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="product-info">
+                                <h3 class="product-title">
+                                    <a href="{{ route('shop.show', ['public_id' => $compProduct->public_id, 'slug' => $compProduct->slug]) }}" class="text-decoration-none">
+                                        {{ $compProduct->name }}
+                                    </a>
+                                </h3>
+
+                                @if($compProduct->description?->description)
+                                    <p class="product-description">
+                                        {{ Str::limit($compProduct->description->description, 60) }}
+                                    </p>
+                                @endif
+
+                                <div class="product-prices">
+                                    <span class="product-price">Tsh {{ number_format((float) $compProduct->new_price, 0) }}</span>
+                                    @if($compProduct->old_price && $compProduct->old_price > $compProduct->new_price)
+                                        <span class="product-old-price">Tsh {{ number_format((float) $compProduct->old_price, 0) }}</span>
+                                    @endif
+                                </div>
+
+                                <div class="product-rating">
+                                    <div class="stars">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            @if($compProduct->rate > 0)
+                                                <i class="bi {{ $i <= round($compProduct->rate) ? 'bi-star-fill' : 'bi-star' }} star"></i>
+                                            @else
+                                                <i class="bi bi-star star text-secondary"></i>
+                                            @endif
+                                        @endfor
+                                    </div>
+                                    <span class="rating-count">({{ number_format((float) $compProduct->rate, 1) }})</span>
+                                    <span class="stock-status {{ $compProduct->stock > 10 ? 'stock-in' : ($compProduct->stock > 0 ? 'stock-low' : 'stock-out') }}">
+                                        @if($compProduct->stock > 10)
+                                            In Stock
+                                        @elseif($compProduct->stock > 0)
+                                            Only {{ $compProduct->stock }} left
+                                        @else
+                                            Out of Stock
+                                        @endif
+                                    </span>
+                                </div>
+
+                                <div class="product-meta">
+                                    <span class="category">
+                                        <i class="bi bi-tag-fill"></i> {{ $compProduct->category->name ?? 'Uncategorized' }}
+                                    </span>
+                                </div>
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
+            </section>
+        @endif
+
+        <!-- Product Recommendations -->
+        @if (!empty($aiRecommendations) && count($aiRecommendations) > 0)
+            <section class="related-products category-related-products" id="ai-related-section">
+                <h2 class="related-title">{{ $hasOrderHistory ? 'Recommended Products' : 'You may also like' }}</h2>
+                <div class="products-grid ai-products-grid">
+                    @foreach ($aiRecommendations as $rec)
+                        @php
+                            $aiProduct = $rec['product'] ?? null;
+                        @endphp
+                        @if($aiProduct)
+                            @include('partials.ai-product-card', [
+                                'product' => $aiProduct,
+                                'showAiBadge' => false,
+                                'confidence' => $rec['confidence'] ?? 0,
+                            ])
+                        @endif
+                    @endforeach
+                </div>
+            </section>
+        @endif
+
+        <!-- Related Products (Category-based fallback) -->
         @if ($relatedProducts->count() > 0)
-            <section class="related-products">
-                <h2 class="related-title">You might also like</h2>
+            <section class="related-products category-related-products">
+                <h2 class="related-title">Related Products</h2>
                 <div class="products-grid">
                     @foreach ($relatedProducts as $relatedProduct)
                         <article class="product-card">
@@ -488,6 +576,7 @@ for any non-commercial educational purpose. See LICENSE.md.
 @section('scripts')
     <script src="{{ asset('js/show.js') }}"></script>
     <script src="{{ asset('js/show-rating.js') }}"></script>
+    <script src="{{ asset('js/ai-recommendations.js') }}"></script>
 @endsection
 
 @endsection
