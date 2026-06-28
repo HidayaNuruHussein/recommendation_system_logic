@@ -10,7 +10,7 @@ for any non-commercial educational purpose. See LICENSE.md.
 
 <head>
     <meta charset="UTF-8">
-    <title>@yield('title', 'Kids Shop')</title>
+    <title>@yield('title', 'Electronics')</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <meta name="csrf-token" content="{{ csrf_token() }}">

@@ -99,7 +99,7 @@ class ShopController extends Controller
                 ->orderByDesc('views')
                 ->orderByDesc('created_at');
 
-$featuredRows = [
+            $featuredRows = [
                 'row1_title' => 'All Products',
                 'row1' => $this->fetchProductsByOrderedIds($newestIds, 12),
                 'row2_title' => 'Top Rated Products',
@@ -157,20 +157,21 @@ $featuredRows = [
             $query->where('stock', '>', 0);
         }])->orderBy('name')->get();
 
+        // ✅ RECOMMENDATIONS FOR HOMEPAGE - USE recommendForUser()
         $aiRecommendations = [];
         $hasOrderHistory = false;
 
         if (Auth::check()) {
             try {
                 $ai = app(HybridRecommendationService::class);
-                $userHistory = $this->getUserInteractionProductIds(8);
-                if (! empty($userHistory)) {
-                    $aiRecommendations = $ai->recommendForCart($userHistory, 8);
-                }
+                // ✅ TUMIA recommendForUser kwa homepage
+                $aiRecommendations = $ai->recommendForUser(Auth::id(), 8);
+                
                 if (empty($aiRecommendations)) {
                     $aiRecommendations = $ai->fallbackGeneral(8);
                 }
-                $hasOrderHistory = \Illuminate\Support\Facades\DB::table('orders')
+                
+                $hasOrderHistory = DB::table('orders')
                     ->where('user_id', Auth::id())
                     ->whereIn('status', ['completed', 'delivered'])
                     ->exists();
@@ -182,6 +183,9 @@ $featuredRows = [
         return view('shop', compact('products', 'categories', 'featuredRows', 'aiRecommendations', 'hasOrderHistory'));
     }
 
+    // ============================================
+    // ✅ PRODUCT PAGE - UPDATED TO USE CATEGORY PROXIMITY
+    // ============================================
     public function show(string $publicId, string $slug)
     {
         $product = $this->resolveShopProduct($publicId, ['category', 'media', 'description', 'ratings.user']);
@@ -199,35 +203,44 @@ $featuredRows = [
             ->where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
             ->where('stock', '>', 0)
+            ->orderByDesc('rate')
+            ->orderByDesc('views')
             ->take(4)
             ->get();
 
         // Get complementary products (frequently bought together)
         $complementaryProducts = collect();
 
-        // Recommendations: Apriori + complementary products for logged-in users with orders
+        // ✅ RECOMMENDATIONS FOR PRODUCT PAGE - USE recommendByCategoryProximity()
         $aiRecommendations = [];
         $hasOrderHistory = false;
+        
         try {
             $ai = app(HybridRecommendationService::class);
-            $userHistory = $this->getUserInteractionProductIds(8);
-            if (! empty($userHistory)) {
-                $aiRecommendations = $ai->recommendForCart($userHistory, 8);
-            }
+            
+            // ✅ TUMIA recommendByCategoryProximity — inatumia parent_id, category_group, tags
+            $aiRecommendations = $ai->recommendByCategoryProximity($product->id, 8);
+            
+            // ✅ IKIWA HAKUNA, TUMIA fallbackForProduct (same category)
             if (empty($aiRecommendations)) {
-                $aiRecommendations = $ai->recommend($product->id, 8);
+                $aiRecommendations = $ai->fallbackForProduct($product->id, 8);
             }
+            
+            // ✅ IKIWA BADO HAKUNA, RUDISHA TUPU (USITUMIE fallbackGeneral)
             if (empty($aiRecommendations)) {
-                $aiRecommendations = $ai->fallbackGeneral(8);
+                $aiRecommendations = [];
             }
+            
             // For logged-in users with completed orders, get complementary products
             if (Auth::check()) {
-                $hasOrderHistory = \Illuminate\Support\Facades\DB::table('orders')
+                $hasOrderHistory = DB::table('orders')
                     ->where('user_id', Auth::id())
                     ->whereIn('status', ['completed', 'delivered'])
                     ->exists();
+                    
                 if ($hasOrderHistory) {
-                    $complementaryProducts = $product->complementaryProducts(4);
+                    // ✅ TUMIA recommendForCart kwa complementary products
+                    $complementaryProducts = $ai->recommendForCart([$product->id], 4);
                 }
             }
         } catch (\Throwable $e) {

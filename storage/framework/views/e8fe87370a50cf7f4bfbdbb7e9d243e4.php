@@ -1,9 +1,9 @@
-@extends('layouts.app')
 
-@section('title', 'Shop - electronicStore')
 
-@section('css')
-<link rel="stylesheet" href="{{ asset('css/shop.css') }}">
+<?php $__env->startSection('title', 'Shop - electronicStore'); ?>
+
+<?php $__env->startSection('css'); ?>
+<link rel="stylesheet" href="<?php echo e(asset('css/shop.css')); ?>">
 <style>
     /* ============================================ */
     /* AI RECOMMENDATIONS - RESPONSIVE GRID */
@@ -261,13 +261,13 @@
         border-radius: 10px;
     }
 </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 <main class="shop-container">
-@php
+<?php
     $hasActiveFilter = filled(request('search')) || filled(request('category'));
-@endphp
+?>
 <!-- Search and Categories in Header -->
 <div class="shop-header-sticky">
     <div class="container-fluid">
@@ -275,25 +275,25 @@
             <div class="col-12">
                 <!-- Search Bar Section -->
                 <div class="search-section mb-3">
-                    @php
+                    <?php
                         $selectedSort = request('sort_by') && request('sort_order') ? request('sort_by') . '-' . request('sort_order') : '';
-                    @endphp
-                    <form method="GET" action="{{ route('shop') }}" id="shop-search-form">
+                    ?>
+                    <form method="GET" action="<?php echo e(route('shop')); ?>" id="shop-search-form">
                         <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap flex-md-nowrap search-sort-row">
                             <div class="search-bar position-relative search-bar-compact">
-                                <input type="text" class="form-control" name="search" placeholder="Search products..." value="{{ request('search') }}">
+                                <input type="text" class="form-control" name="search" placeholder="Search products..." value="<?php echo e(request('search')); ?>">
                                 <button type="submit" class="d-flex align-items-center justify-content-center">
                                     <i class="bi bi-search"></i>
                                 </button>
                             </div>
                             <select class="form-select form-select-sm shop-sort-select" id="shop-sort-select" aria-label="Sort products">
                                 <option value="">Sort by</option>
-                                <option value="created_at-desc" {{ $selectedSort === 'created_at-desc' ? 'selected' : '' }}>Newest</option>
-                                <option value="name-asc" {{ $selectedSort === 'name-asc' ? 'selected' : '' }}>Name (A-Z)</option>
-                                <option value="name-desc" {{ $selectedSort === 'name-desc' ? 'selected' : '' }}>Name (Z-A)</option>
-                                <option value="new_price-asc" {{ $selectedSort === 'new_price-asc' ? 'selected' : '' }}>Price (Low to High)</option>
-                                <option value="new_price-desc" {{ $selectedSort === 'new_price-desc' ? 'selected' : '' }}>Price (High to Low)</option>
-                                <option value="rate-desc" {{ $selectedSort === 'rate-desc' ? 'selected' : '' }}>Highest Rated</option>
+                                <option value="created_at-desc" <?php echo e($selectedSort === 'created_at-desc' ? 'selected' : ''); ?>>Newest</option>
+                                <option value="name-asc" <?php echo e($selectedSort === 'name-asc' ? 'selected' : ''); ?>>Name (A-Z)</option>
+                                <option value="name-desc" <?php echo e($selectedSort === 'name-desc' ? 'selected' : ''); ?>>Name (Z-A)</option>
+                                <option value="new_price-asc" <?php echo e($selectedSort === 'new_price-asc' ? 'selected' : ''); ?>>Price (Low to High)</option>
+                                <option value="new_price-desc" <?php echo e($selectedSort === 'new_price-desc' ? 'selected' : ''); ?>>Price (High to Low)</option>
+                                <option value="rate-desc" <?php echo e($selectedSort === 'rate-desc' ? 'selected' : ''); ?>>Highest Rated</option>
                             </select>
                         </div>
                     </form>
@@ -302,22 +302,23 @@
                 <!-- Categories Section -->
                 <div class="categories-header-section">
                     <div class="categories-grid d-flex gap-2 justify-content-start" id="shop-categories-grid">
-                        @php
+                        <?php
                             $allCategoriesQuery = request()->query();
                             unset($allCategoriesQuery['category']);
-                        @endphp
-                        <a href="{{ route('shop') }}?{{ http_build_query($allCategoriesQuery) }}" class="category-pill btn btn-sm {{ !request('category') ? 'category-pill-selected' : 'category-pill-default' }}">
+                        ?>
+                        <a href="<?php echo e(route('shop')); ?>?<?php echo e(http_build_query($allCategoriesQuery)); ?>" class="category-pill btn btn-sm <?php echo e(!request('category') ? 'category-pill-selected' : 'category-pill-default'); ?>">
                             <i class="bi bi-grid-fill me-1"></i>All Categories
                         </a>
-                        @foreach($categories as $category)
-                            @php
+                        <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <?php
                                 $categoryQuery = request()->query();
                                 $categoryQuery['category'] = $category->id;
-                            @endphp
-                        <a href="{{ route('shop') }}?{{ http_build_query($categoryQuery) }}" class="category-pill btn btn-sm {{ request('category') == $category->id ? 'category-pill-selected' : 'category-pill-default' }}">
-                                {{ $category->name }}
+                            ?>
+                        <a href="<?php echo e(route('shop')); ?>?<?php echo e(http_build_query($categoryQuery)); ?>" class="category-pill btn btn-sm <?php echo e(request('category') == $category->id ? 'category-pill-selected' : 'category-pill-default'); ?>">
+                                <?php echo e($category->name); ?>
+
                             </a>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                 </div>
             </div>
@@ -332,28 +333,28 @@
 <!-- ============================================ -->
 <!-- 1. PRODUCT RECOMMENDATIONS (HOMEPAGE) -->
 <!-- ============================================ -->
-@if(Auth::check() && !empty($aiRecommendations) && count($aiRecommendations) > 0)
+<?php if(Auth::check() && !empty($aiRecommendations) && count($aiRecommendations) > 0): ?>
     <section class="mb-4 ai-recommendations-section featured-row-panel" id="ai-recommendations-section">
         <div class="d-flex justify-content-between align-items-center mb-2">
             <h2 class="h5 fw-bold mb-0 featured-row-title">
                 <i class="bi bi-robot me-2"></i>
                 <span>Recommended Products</span>
             </h2>
-            @if(isset($aiRecommendations[0]['source']))
+            <?php if(isset($aiRecommendations[0]['source'])): ?>
                 <span class="badge bg-info text-white small">
                     <i class="bi bi-robot me-1"></i>AI Powered
                 </span>
-            @endif
+            <?php endif; ?>
         </div>
-        @if(isset($aiRecommendations[0]['source']))
+        <?php if(isset($aiRecommendations[0]['source'])): ?>
             <p class="text-muted small mb-3">
                 <i class="bi bi-lightbulb me-1"></i>
                 Based on your browsing history and preferences
             </p>
-        @endif
+        <?php endif; ?>
         <div class="products-grid ai-products-grid">
-            @foreach($aiRecommendations as $rec)
-                @php
+            <?php $__currentLoopData = $aiRecommendations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $rec): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php
                     $aiProduct = $rec['product'] ?? null;
                     $confidence = $rec['confidence'] ?? 0;
                     $source = $rec['source'] ?? 'general';
@@ -375,106 +376,113 @@
                     $parentName = $category->parent->name ?? null;
                     $groupName = $category->category_group ?? null;
                     $tags = $category->tags ?? [];
-                @endphp
-                @if($aiProduct)
+                ?>
+                <?php if($aiProduct): ?>
                     <div class="product-card ai-product-card">
                         <div class="product-image">
-                            <a href="{{ route('shop.show', ['public_id' => $aiProduct->public_id, 'slug' => $aiProduct->slug]) }}" class="text-decoration-none">
-                                <img src="{{ $aiProduct->thumbnail ? asset('storage/' . $aiProduct->thumbnail) : asset('img/logo.png') }}" alt="{{ $aiProduct->name }}" loading="lazy">
+                            <a href="<?php echo e(route('shop.show', ['public_id' => $aiProduct->public_id, 'slug' => $aiProduct->slug])); ?>" class="text-decoration-none">
+                                <img src="<?php echo e($aiProduct->thumbnail ? asset('storage/' . $aiProduct->thumbnail) : asset('img/logo.png')); ?>" alt="<?php echo e($aiProduct->name); ?>" loading="lazy">
                             </a>
                             <div class="product-badges">
-                                @if($aiProduct->created_at->diffInDays(now()) <= 7)
+                                <?php if($aiProduct->created_at->diffInDays(now()) <= 7): ?>
                                     <span class="product-badge badge-new">New</span>
-                                @endif
-                                @if($confidence > 0.7)
+                                <?php endif; ?>
+                                <?php if($confidence > 0.7): ?>
                                     <span class="product-badge badge-recommended">★ Recommended</span>
-                                @endif
-                                <span class="product-badge badge-category">{{ $categoryName }}</span>
-                                <!-- @if($parentName)
-                                    <span class="product-badge badge-parent">{{ $parentName }}</span>
-                                @endif
-                                @if($groupName && $groupName !== 'Other')
-                                    <span class="product-badge badge-group">{{ $groupName }}</span>
-                                @endif -->
+                                <?php endif; ?>
+                                <span class="product-badge badge-category"><?php echo e($categoryName); ?></span>
+                                <!-- <?php if($parentName): ?>
+                                    <span class="product-badge badge-parent"><?php echo e($parentName); ?></span>
+                                <?php endif; ?>
+                                <?php if($groupName && $groupName !== 'Other'): ?>
+                                    <span class="product-badge badge-group"><?php echo e($groupName); ?></span>
+                                <?php endif; ?> -->
                             </div>
                         </div>
                         <div class="product-info">
                             <h3 class="product-title">
-                                <a href="{{ route('shop.show', ['public_id' => $aiProduct->public_id, 'slug' => $aiProduct->slug]) }}" class="text-decoration-none">
-                                    {{ $aiProduct->name }}
+                                <a href="<?php echo e(route('shop.show', ['public_id' => $aiProduct->public_id, 'slug' => $aiProduct->slug])); ?>" class="text-decoration-none">
+                                    <?php echo e($aiProduct->name); ?>
+
                                 </a>
                             </h3>
-                            @if($aiProduct->description?->description)
+                            <?php if($aiProduct->description?->description): ?>
                                 <p class="product-description">
-                                    {{ Str::limit($aiProduct->description->description, 60) }}
+                                    <?php echo e(Str::limit($aiProduct->description->description, 60)); ?>
+
                                 </p>
-                            @endif
+                            <?php endif; ?>
                             <div class="product-prices">
-                                <span class="product-price">Tsh {{ number_format((float) $aiProduct->new_price, 0) }}</span>
-                                @if($aiProduct->old_price && $aiProduct->old_price > $aiProduct->new_price)
-                                    <span class="product-old-price">Tsh {{ number_format((float) $aiProduct->old_price, 0) }}</span>
-                                @endif
+                                <span class="product-price">Tsh <?php echo e(number_format((float) $aiProduct->new_price, 0)); ?></span>
+                                <?php if($aiProduct->old_price && $aiProduct->old_price > $aiProduct->new_price): ?>
+                                    <span class="product-old-price">Tsh <?php echo e(number_format((float) $aiProduct->old_price, 0)); ?></span>
+                                <?php endif; ?>
                             </div>
                             <div class="product-rating">
                                 <div class="stars">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        @if($aiProduct->rate > 0)
-                                            <i class="bi {{ $i <= round($aiProduct->rate) ? 'bi-star-fill' : 'bi-star' }} star"></i>
-                                        @else
+                                    <?php for($i = 1; $i <= 5; $i++): ?>
+                                        <?php if($aiProduct->rate > 0): ?>
+                                            <i class="bi <?php echo e($i <= round($aiProduct->rate) ? 'bi-star-fill' : 'bi-star'); ?> star"></i>
+                                        <?php else: ?>
                                             <i class="bi bi-star star text-secondary"></i>
-                                        @endif
-                                    @endfor
+                                        <?php endif; ?>
+                                    <?php endfor; ?>
                                 </div>
-                                <span class="rating-count">({{ number_format((float) $aiProduct->rate, 1) }})</span>
+                                <span class="rating-count">(<?php echo e(number_format((float) $aiProduct->rate, 1)); ?>)</span>
                             </div>
                             <div class="product-meta">
                                 <span class="category">
-                                    <i class="bi bi-tag-fill"></i> {{ $categoryName }}
+                                    <i class="bi bi-tag-fill"></i> <?php echo e($categoryName); ?>
+
                                 </span>
                                 <span class="recommendation-tag small text-muted">
-                                    <i class="bi bi-info-circle"></i> {{ $sourceLabel }}
+                                    <i class="bi bi-info-circle"></i> <?php echo e($sourceLabel); ?>
+
                                 </span>
                             </div>
                             <div class="category-info-row">
-                                <!-- @if($parentName)
+                                <!-- <?php if($parentName): ?>
                                     <span class="badge badge-parent">
-                                        <i class="bi bi-diagram-3 me-1"></i>{{ $parentName }}
+                                        <i class="bi bi-diagram-3 me-1"></i><?php echo e($parentName); ?>
+
                                     </span>
-                                @endif
-                                @if($groupName && $groupName !== 'Other')
+                                <?php endif; ?>
+                                <?php if($groupName && $groupName !== 'Other'): ?>
                                     <span class="badge badge-group">
-                                        <i class="bi bi-grid me-1"></i>{{ $groupName }}
+                                        <i class="bi bi-grid me-1"></i><?php echo e($groupName); ?>
+
                                     </span>
-                                @endif -->
-                                @if(!empty($tags) && is_array($tags))
-                                    @foreach(array_slice($tags, 0, 2) as $tag)
+                                <?php endif; ?> -->
+                                <?php if(!empty($tags) && is_array($tags)): ?>
+                                    <?php $__currentLoopData = array_slice($tags, 0, 2); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tag): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <span class="badge badge-tags">
-                                            <i class="bi bi-tag me-1"></i>{{ $tag }}
+                                            <i class="bi bi-tag me-1"></i><?php echo e($tag); ?>
+
                                         </span>
-                                    @endforeach
-                                    @if(count($tags) > 2)
-                                        <span class="badge badge-tags">+{{ count($tags) - 2 }}</span>
-                                    @endif
-                                @endif
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    <?php if(count($tags) > 2): ?>
+                                        <span class="badge badge-tags">+<?php echo e(count($tags) - 2); ?></span>
+                                    <?php endif; ?>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
-                @endif
-            @endforeach
+                <?php endif; ?>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
         <div class="mobile-scroll-indicator" aria-hidden="true">
             <span class="mobile-scroll-thumb"></span>
         </div>
     </section>
-@endif
+<?php endif; ?>
 
 <!-- ============================================ -->
 <!-- 2. FEATURED ROWS -->
 <!-- ============================================ -->
-@if(!$hasActiveFilter && !empty($featuredRows))
+<?php if(!$hasActiveFilter && !empty($featuredRows)): ?>
     <div class="mb-4 featured-rows-scroll" id="featured-rows-container">
-        @foreach (['row1', 'row2', 'row3'] as $rowKey)
-            @php
+        <?php $__currentLoopData = ['row1', 'row2', 'row3']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $rowKey): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php
                 $rowProducts = $featuredRows[$rowKey] ?? collect();
                 $rowTitle = $featuredRows[$rowKey . '_title'] ?? '';
                 $rowIcon = match($rowKey) {
@@ -483,86 +491,91 @@
                     'row3' => 'bi-eye',
                     default => 'bi-grid-fill'
                 };
-            @endphp
-            @if($rowProducts->isNotEmpty())
+            ?>
+            <?php if($rowProducts->isNotEmpty()): ?>
                 <section class="mb-4 featured-row-section featured-row-panel">
                     <h2 class="h5 fw-bold mb-3 featured-row-title">
-                        <i class="bi {{ $rowIcon }} me-2"></i>{{ $rowTitle }}
+                        <i class="bi <?php echo e($rowIcon); ?> me-2"></i><?php echo e($rowTitle); ?>
+
                     </h2>
                     <div class="products-grid featured-products-grid">
-                        @foreach($rowProducts as $product)
-                            @php
+                        <?php $__currentLoopData = $rowProducts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <?php
                                 $cat = $product->category;
                                 $parentName = $cat->parent->name ?? null;
                                 $groupName = $cat->category_group ?? null;
-                            @endphp
+                            ?>
                             <article class="product-card featured-product-card">
                                 <div class="product-image">
-                                    <a href="{{ route('shop.show', ['public_id' => $product->public_id, 'slug' => $product->slug]) }}" class="text-decoration-none">
-                                        <img src="{{ $product->thumbnail ? asset('storage/' . $product->thumbnail) : asset('img/logo.png') }}" alt="{{ $product->name }}" loading="lazy">
+                                    <a href="<?php echo e(route('shop.show', ['public_id' => $product->public_id, 'slug' => $product->slug])); ?>" class="text-decoration-none">
+                                        <img src="<?php echo e($product->thumbnail ? asset('storage/' . $product->thumbnail) : asset('img/logo.png')); ?>" alt="<?php echo e($product->name); ?>" loading="lazy">
                                     </a>
                                     <div class="product-badges">
-                                        @if($product->created_at->diffInDays(now()) <= 7)
+                                        <?php if($product->created_at->diffInDays(now()) <= 7): ?>
                                             <span class="product-badge badge-new">New</span>
-                                        @endif
-                                        <!-- @if($parentName)
-                                            <span class="product-badge badge-parent">{{ $parentName }}</span>
-                                        @endif
-                                        @if($groupName && $groupName !== 'Other')
-                                            <span class="product-badge badge-group">{{ $groupName }}</span>
-                                        @endif -->
+                                        <?php endif; ?>
+                                        <!-- <?php if($parentName): ?>
+                                            <span class="product-badge badge-parent"><?php echo e($parentName); ?></span>
+                                        <?php endif; ?>
+                                        <?php if($groupName && $groupName !== 'Other'): ?>
+                                            <span class="product-badge badge-group"><?php echo e($groupName); ?></span>
+                                        <?php endif; ?> -->
                                     </div>
                                 </div>
                                 <div class="product-info">
                                     <h3 class="product-title">
-                                        <a href="{{ route('shop.show', ['public_id' => $product->public_id, 'slug' => $product->slug]) }}" class="text-decoration-none">
-                                            {{ $product->name }}
+                                        <a href="<?php echo e(route('shop.show', ['public_id' => $product->public_id, 'slug' => $product->slug])); ?>" class="text-decoration-none">
+                                            <?php echo e($product->name); ?>
+
                                         </a>
                                     </h3>
-                                    @if($product->description?->description)
+                                    <?php if($product->description?->description): ?>
                                         <p class="product-description">
-                                            {{ Str::limit($product->description->description, 60) }}
+                                            <?php echo e(Str::limit($product->description->description, 60)); ?>
+
                                         </p>
-                                    @endif
+                                    <?php endif; ?>
                                     <div class="product-prices">
-                                        <span class="product-price">Tsh {{ number_format((float) $product->new_price, 0) }}</span>
-                                        @if($product->old_price && $product->old_price > $product->new_price)
-                                            <span class="product-old-price">Tsh {{ number_format((float) $product->old_price, 0) }}</span>
-                                        @endif
+                                        <span class="product-price">Tsh <?php echo e(number_format((float) $product->new_price, 0)); ?></span>
+                                        <?php if($product->old_price && $product->old_price > $product->new_price): ?>
+                                            <span class="product-old-price">Tsh <?php echo e(number_format((float) $product->old_price, 0)); ?></span>
+                                        <?php endif; ?>
                                     </div>
                                     <div class="product-rating">
                                         <div class="stars">
-                                            @for($i = 1; $i <= 5; $i++)
-                                                @if($product->rate > 0)
-                                                    <i class="bi {{ $i <= round($product->rate) ? 'bi-star-fill' : 'bi-star' }} star"></i>
-                                                @else
+                                            <?php for($i = 1; $i <= 5; $i++): ?>
+                                                <?php if($product->rate > 0): ?>
+                                                    <i class="bi <?php echo e($i <= round($product->rate) ? 'bi-star-fill' : 'bi-star'); ?> star"></i>
+                                                <?php else: ?>
                                                     <i class="bi bi-star star text-secondary"></i>
-                                                @endif
-                                            @endfor
+                                                <?php endif; ?>
+                                            <?php endfor; ?>
                                         </div>
-                                        <span class="rating-count">({{ number_format((float) $product->rate, 1) }})</span>
-                                        <span class="stock-status {{ $product->stock > 10 ? 'stock-in' : ($product->stock > 0 ? 'stock-low' : 'stock-out') }}">
-                                            @if($product->stock > 10)
-                                                In Stock: {{ $product->stock }}
-                                            @elseif($product->stock > 0)
-                                                In Stock: {{ $product->stock }}
-                                            @else
+                                        <span class="rating-count">(<?php echo e(number_format((float) $product->rate, 1)); ?>)</span>
+                                        <span class="stock-status <?php echo e($product->stock > 10 ? 'stock-in' : ($product->stock > 0 ? 'stock-low' : 'stock-out')); ?>">
+                                            <?php if($product->stock > 10): ?>
+                                                In Stock: <?php echo e($product->stock); ?>
+
+                                            <?php elseif($product->stock > 0): ?>
+                                                In Stock: <?php echo e($product->stock); ?>
+
+                                            <?php else: ?>
                                                 Out of Stock
-                                            @endif
+                                            <?php endif; ?>
                                         </span>
                                     </div>
                                 </div>
                             </article>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                     <div class="mobile-scroll-indicator" aria-hidden="true">
                         <span class="mobile-scroll-thumb"></span>
                     </div>
                 </section>
-            @endif
-        @endforeach
+            <?php endif; ?>
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </div>
-@endif
+<?php endif; ?>
 
 <!-- ============================================ -->
 <!-- 3. PRODUCTS GRID -->
@@ -573,150 +586,160 @@
 </div>
 
 <div class="products-grid" id="productsContainer">
-    @if($products->count() > 0)
-        @foreach($products as $product)
-            @php
+    <?php if($products->count() > 0): ?>
+        <?php $__currentLoopData = $products; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php
                 $cat = $product->category;
                 $parentName = $cat->parent->name ?? null;
                 $groupName = $cat->category_group ?? null;
                 $tags = $cat->tags ?? [];
-            @endphp
+            ?>
             <article class="product-card">
                 <div class="product-image">
-                    <a href="{{ route('shop.show', ['public_id' => $product->public_id, 'slug' => $product->slug]) }}" class="text-decoration-none">
-                        <img src="{{ $product->thumbnail ? asset('storage/' . $product->thumbnail) : asset('img/logo.png') }}" alt="{{ $product->name }}" loading="lazy">
+                    <a href="<?php echo e(route('shop.show', ['public_id' => $product->public_id, 'slug' => $product->slug])); ?>" class="text-decoration-none">
+                        <img src="<?php echo e($product->thumbnail ? asset('storage/' . $product->thumbnail) : asset('img/logo.png')); ?>" alt="<?php echo e($product->name); ?>" loading="lazy">
                     </a>
                     <div class="product-badges">
-                        @if($product->created_at->diffInDays(now()) <= 7)
+                        <?php if($product->created_at->diffInDays(now()) <= 7): ?>
                             <span class="product-badge badge-new">New</span>
-                        @endif
-                        <!-- @if($parentName)
-                            <span class="product-badge badge-parent">{{ $parentName }}</span>
-                        @endif
-                        @if($groupName && $groupName !== 'Other')
-                            <span class="product-badge badge-group">{{ $groupName }}</span>
-                        @endif -->
+                        <?php endif; ?>
+                        <!-- <?php if($parentName): ?>
+                            <span class="product-badge badge-parent"><?php echo e($parentName); ?></span>
+                        <?php endif; ?>
+                        <?php if($groupName && $groupName !== 'Other'): ?>
+                            <span class="product-badge badge-group"><?php echo e($groupName); ?></span>
+                        <?php endif; ?> -->
                     </div>
                 </div>
                 <div class="product-info">
                     <h3 class="product-title">
-                        <a href="{{ route('shop.show', ['public_id' => $product->public_id, 'slug' => $product->slug]) }}" class="text-decoration-none">
-                            {{ $product->name }}
+                        <a href="<?php echo e(route('shop.show', ['public_id' => $product->public_id, 'slug' => $product->slug])); ?>" class="text-decoration-none">
+                            <?php echo e($product->name); ?>
+
                         </a>
                     </h3>
-                    @if($product->description?->description)
+                    <?php if($product->description?->description): ?>
                         <p class="product-description">
-                            {{ Str::limit($product->description->description, 60) }}
+                            <?php echo e(Str::limit($product->description->description, 60)); ?>
+
                         </p>
-                    @endif
+                    <?php endif; ?>
                     <div class="product-prices">
-                        <span class="product-price">Tsh {{ number_format((float) $product->new_price, 0) }}</span>
-                        @if($product->old_price && $product->old_price > $product->new_price)
-                            <span class="product-old-price">Tsh {{ number_format((float) $product->old_price, 0) }}</span>
-                        @endif
+                        <span class="product-price">Tsh <?php echo e(number_format((float) $product->new_price, 0)); ?></span>
+                        <?php if($product->old_price && $product->old_price > $product->new_price): ?>
+                            <span class="product-old-price">Tsh <?php echo e(number_format((float) $product->old_price, 0)); ?></span>
+                        <?php endif; ?>
                     </div>
                     <div class="product-rating">
                         <div class="stars">
-                            @for($i = 1; $i <= 5; $i++)
-                                @if($product->rate > 0)
-                                    <i class="bi {{ $i <= round($product->rate) ? 'bi-star-fill' : 'bi-star' }} star"></i>
-                                @else
+                            <?php for($i = 1; $i <= 5; $i++): ?>
+                                <?php if($product->rate > 0): ?>
+                                    <i class="bi <?php echo e($i <= round($product->rate) ? 'bi-star-fill' : 'bi-star'); ?> star"></i>
+                                <?php else: ?>
                                     <i class="bi bi-star star text-secondary"></i>
-                                @endif
-                            @endfor
+                                <?php endif; ?>
+                            <?php endfor; ?>
                         </div>
-                        <span class="rating-count">({{ number_format((float) $product->rate, 1) }})</span>
-                        <span class="stock-status {{ $product->stock > 10 ? 'stock-in' : ($product->stock > 0 ? 'stock-low' : 'stock-out') }}">
-                            @if($product->stock > 10)
-                                In Stock: {{ $product->stock }}
-                            @elseif($product->stock > 0)
-                                In Stock: {{ $product->stock }}
-                            @else
+                        <span class="rating-count">(<?php echo e(number_format((float) $product->rate, 1)); ?>)</span>
+                        <span class="stock-status <?php echo e($product->stock > 10 ? 'stock-in' : ($product->stock > 0 ? 'stock-low' : 'stock-out')); ?>">
+                            <?php if($product->stock > 10): ?>
+                                In Stock: <?php echo e($product->stock); ?>
+
+                            <?php elseif($product->stock > 0): ?>
+                                In Stock: <?php echo e($product->stock); ?>
+
+                            <?php else: ?>
                                 Out of Stock
-                            @endif
+                            <?php endif; ?>
                         </span>
                     </div>
                     <div class="product-meta">
                         <span class="category">
-                            <i class="bi bi-tag-fill"></i> {{ $cat->name ?? 'Uncategorized' }}
+                            <i class="bi bi-tag-fill"></i> <?php echo e($cat->name ?? 'Uncategorized'); ?>
+
                         </span>
                     </div>
                     <div class="category-info-row">
-                        @if($parentName)
+                        <?php if($parentName): ?>
                             <span class="badge badge-parent">
-                                <i class="bi bi-diagram-3 me-1"></i>{{ $parentName }}
+                                <i class="bi bi-diagram-3 me-1"></i><?php echo e($parentName); ?>
+
                             </span>
-                        @endif
-                        @if($groupName && $groupName !== 'Other')
+                        <?php endif; ?>
+                        <?php if($groupName && $groupName !== 'Other'): ?>
                             <span class="badge badge-group">
-                                <i class="bi bi-grid me-1"></i>{{ $groupName }}
+                                <i class="bi bi-grid me-1"></i><?php echo e($groupName); ?>
+
                             </span>
-                        @endif
-                        @if(!empty($tags) && is_array($tags))
-                            @foreach(array_slice($tags, 0, 2) as $tag)
+                        <?php endif; ?>
+                        <?php if(!empty($tags) && is_array($tags)): ?>
+                            <?php $__currentLoopData = array_slice($tags, 0, 2); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tag): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <span class="badge badge-tags">
-                                    <i class="bi bi-tag me-1"></i>{{ $tag }}
+                                    <i class="bi bi-tag me-1"></i><?php echo e($tag); ?>
+
                                 </span>
-                            @endforeach
-                            @if(count($tags) > 2)
-                                <span class="badge badge-tags">+{{ count($tags) - 2 }}</span>
-                            @endif
-                        @endif
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            <?php if(count($tags) > 2): ?>
+                                <span class="badge badge-tags">+<?php echo e(count($tags) - 2); ?></span>
+                            <?php endif; ?>
+                        <?php endif; ?>
                     </div>
                 </div>
             </article>
-        @endforeach
-    @else
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+    <?php else: ?>
         <div class="no-products-found">
             <div class="shop-empty text-center p-4 p-md-5">
                 <i class="bi bi-search d-inline-block mb-2"></i>
                 <h3 class="h5 mb-2">No products found</h3>
                 <p class="mb-3">Try adjusting your search criteria or browse different categories</p>
-                @if(Auth::check() && !empty($aiRecommendations) && count($aiRecommendations) > 0)
+                <?php if(Auth::check() && !empty($aiRecommendations) && count($aiRecommendations) > 0): ?>
                     <div class="mt-4">
                         <p class="text-muted small fw-bold mb-2">
                             <i class="bi bi-lightbulb me-1"></i> Meanwhile, check these recommendations:
                         </p>
                         <div class="products-grid ai-products-grid mt-3">
-                            @foreach(array_slice($aiRecommendations, 0, 4) as $rec)
-                                @php $aiProduct = $rec['product'] ?? null; @endphp
-                                @if($aiProduct)
+                            <?php $__currentLoopData = array_slice($aiRecommendations, 0, 4); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $rec): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php $aiProduct = $rec['product'] ?? null; ?>
+                                <?php if($aiProduct): ?>
                                     <div class="product-card ai-product-card">
                                         <div class="product-image">
-                                            <a href="{{ route('shop.show', ['public_id' => $aiProduct->public_id, 'slug' => $aiProduct->slug]) }}" class="text-decoration-none">
-                                                <img src="{{ $aiProduct->thumbnail ? asset('storage/' . $aiProduct->thumbnail) : asset('img/logo.png') }}" alt="{{ $aiProduct->name }}" loading="lazy">
+                                            <a href="<?php echo e(route('shop.show', ['public_id' => $aiProduct->public_id, 'slug' => $aiProduct->slug])); ?>" class="text-decoration-none">
+                                                <img src="<?php echo e($aiProduct->thumbnail ? asset('storage/' . $aiProduct->thumbnail) : asset('img/logo.png')); ?>" alt="<?php echo e($aiProduct->name); ?>" loading="lazy">
                                             </a>
                                             <div class="product-badges">
-                                                <span class="product-badge badge-category">{{ $aiProduct->category->name ?? 'Uncategorized' }}</span>
+                                                <span class="product-badge badge-category"><?php echo e($aiProduct->category->name ?? 'Uncategorized'); ?></span>
                                             </div>
                                         </div>
                                         <div class="product-info">
                                             <h3 class="product-title">
-                                                <a href="{{ route('shop.show', ['public_id' => $aiProduct->public_id, 'slug' => $aiProduct->slug]) }}" class="text-decoration-none">
-                                                    {{ $aiProduct->name }}
+                                                <a href="<?php echo e(route('shop.show', ['public_id' => $aiProduct->public_id, 'slug' => $aiProduct->slug])); ?>" class="text-decoration-none">
+                                                    <?php echo e($aiProduct->name); ?>
+
                                                 </a>
                                             </h3>
                                             <div class="product-prices">
-                                                <span class="product-price">Tsh {{ number_format((float) $aiProduct->new_price, 0) }}</span>
+                                                <span class="product-price">Tsh <?php echo e(number_format((float) $aiProduct->new_price, 0)); ?></span>
                                             </div>
                                         </div>
                                     </div>
-                                @endif
-                            @endforeach
+                                <?php endif; ?>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
                     </div>
-                @endif
-                <a href="{{ route('shop') }}" class="btn shop-empty-btn mt-3">
+                <?php endif; ?>
+                <a href="<?php echo e(route('shop')); ?>" class="btn shop-empty-btn mt-3">
                     <i class="bi bi-arrow-clockwise me-1"></i>Reset
                 </a>
             </div>
         </div>
-    @endif
+    <?php endif; ?>
 </div>
 
 <!-- Pagination -->
 <div id="shop-pagination" style="display:none;">
-    {{ $products->appends(request()->query())->links() }}
+    <?php echo e($products->appends(request()->query())->links()); ?>
+
 </div>
 <div id="shop-infinite-loader" class="text-center py-3" style="display:none;">
     <span class="loading-spinner"></span>
@@ -727,9 +750,10 @@
 <div id="shop-scroll-sentinel" style="height: 1px;"></div>
 
 </main>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
-<script src="{{ asset('js/shop.js') }}"></script>
-<script src="{{ asset('js/ai-recommendations.js') }}"></script>
-@endsection
+<?php $__env->startSection('scripts'); ?>
+<script src="<?php echo e(asset('js/shop.js')); ?>"></script>
+<script src="<?php echo e(asset('js/ai-recommendations.js')); ?>"></script>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\recommendation_system_logic\resources\views/shop.blade.php ENDPATH**/ ?>

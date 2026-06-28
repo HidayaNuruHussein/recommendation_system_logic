@@ -1,10 +1,10 @@
-@extends('layouts.app')
 
-@section('title', $product->name . ' - electronicStore')
 
-@section('css')
-    <link rel="stylesheet" href="{{ asset('css/shop.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/show.css') }}">
+<?php $__env->startSection('title', $product->name . ' - electronicStore'); ?>
+
+<?php $__env->startSection('css'); ?>
+    <link rel="stylesheet" href="<?php echo e(asset('css/shop.css')); ?>">
+    <link rel="stylesheet" href="<?php echo e(asset('css/show.css')); ?>">
     <style>
         /* ✅ AI RECOMMENDATIONS GRID - RESPONSIVE */
         .ai-products-grid {
@@ -368,10 +368,10 @@
             color: #fff;
         }
     </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
 
-@section('content')
+<?php $__env->startSection('content'); ?>
     <!-- Notification -->
     <div id="notification" class="notification" style="display: none;">
         <div class="notification-content">
@@ -383,7 +383,7 @@
     <div class="container py-3 py-md-4">
     <!-- Shop Menu Icon -->
     <div class="shop-menu-icon mb-3">
-        <a href="{{ route('shop') }}" class="btn btn-outline-secondary btn-sm show-dot-btn" data-spin-link="1" title="Back to Shop">
+        <a href="<?php echo e(route('shop')); ?>" class="btn btn-outline-secondary btn-sm show-dot-btn" data-spin-link="1" title="Back to Shop">
             <span class="btn-dot-spinner" aria-hidden="true"><span></span><span></span><span></span></span>
             <span class="button-text"><i class="bi bi-arrow-left"></i> Back to Shop</span>
         </a>
@@ -398,31 +398,31 @@
                     <div class="gallery-top-row">
                         <div class="gallery-sidebar">
                             <div class="gallery-thumbs-vertical">
-                                @php
+                                <?php
                                     $images = $product->media->where('type', 'image') ?: collect();
                                     $primaryImage = $images->where('is_primary', true)->first() ?: $images->first();
-                                @endphp
+                                ?>
 
-                                @if ($primaryImage)
-                                    @foreach ($images as $image)
-                                        <div class="thumb-image {{ $loop->first ? 'active' : '' }}"
-                                            data-image-src="{{ asset('storage/' . $image->file_path) }}"
-                                            onclick="changeImage('{{ asset('storage/' . $image->file_path) }}', this)">
-                                            <img src="{{ asset('storage/' . $image->file_path) }}"
-                                                alt="{{ $product->name }}">
+                                <?php if($primaryImage): ?>
+                                    <?php $__currentLoopData = $images; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $image): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <div class="thumb-image <?php echo e($loop->first ? 'active' : ''); ?>"
+                                            data-image-src="<?php echo e(asset('storage/' . $image->file_path)); ?>"
+                                            onclick="changeImage('<?php echo e(asset('storage/' . $image->file_path)); ?>', this)">
+                                            <img src="<?php echo e(asset('storage/' . $image->file_path)); ?>"
+                                                alt="<?php echo e($product->name); ?>">
                                         </div>
-                                    @endforeach
-                                @endif
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                <?php endif; ?>
                             </div>
                         </div>
 
                         <div class="main-image" id="mainImageFrame">
-                            @php
+                            <?php
                                 $mainImage = $primaryImage
                                     ? asset('storage/' . $primaryImage->file_path)
                                     : asset('img/logo.png');
-                            @endphp
-                            @if ($primaryImage && $images->count() > 1)
+                            ?>
+                            <?php if($primaryImage && $images->count() > 1): ?>
                                 <button
                                     type="button"
                                     class="gallery-nav-btn gallery-nav-prev"
@@ -437,149 +437,155 @@
                                     aria-label="Next image">
                                     <i class="bi bi-chevron-right"></i>
                                 </button>
-                            @endif
-                            <img id="mainImage" src="{{ $mainImage }}" alt="{{ $product->name }}">
+                            <?php endif; ?>
+                            <img id="mainImage" src="<?php echo e($mainImage); ?>" alt="<?php echo e($product->name); ?>">
                         </div>
                     </div>
 
-                    @if ($primaryImage && $images->count() > 1)
+                    <?php if($primaryImage && $images->count() > 1): ?>
                         <div class="mobile-gallery-dots">
-                            @foreach ($images as $image)
+                            <?php $__currentLoopData = $images; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $image): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <button
                                     type="button"
-                                    class="gallery-dot {{ $loop->first ? 'active' : '' }}"
-                                    data-image-src="{{ asset('storage/' . $image->file_path) }}"
-                                    onclick="selectImageBySrc('{{ asset('storage/' . $image->file_path) }}')"
-                                    aria-label="View image {{ $loop->iteration }}">
+                                    class="gallery-dot <?php echo e($loop->first ? 'active' : ''); ?>"
+                                    data-image-src="<?php echo e(asset('storage/' . $image->file_path)); ?>"
+                                    onclick="selectImageBySrc('<?php echo e(asset('storage/' . $image->file_path)); ?>')"
+                                    aria-label="View image <?php echo e($loop->iteration); ?>">
                                 </button>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
-                    @endif
+                    <?php endif; ?>
 
                     <!-- Bottom row: Horizontal thumbnails -->
-                    @if ($primaryImage && $images->count() > 1)
+                    <?php if($primaryImage && $images->count() > 1): ?>
                         <div class="horizontal-thumbs-container">
                             <div class="gallery-thumbs-horizontal">
-                                @foreach ($images as $image)
-                                    <div class="thumb-image-horizontal {{ $loop->first ? 'active' : '' }}"
-                                        data-image-src="{{ asset('storage/' . $image->file_path) }}"
-                                        onclick="changeImage('{{ asset('storage/' . $image->file_path) }}', this)">
-                                        <img src="{{ asset('storage/' . $image->file_path) }}" alt="{{ $product->name }}">
+                                <?php $__currentLoopData = $images; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $image): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <div class="thumb-image-horizontal <?php echo e($loop->first ? 'active' : ''); ?>"
+                                        data-image-src="<?php echo e(asset('storage/' . $image->file_path)); ?>"
+                                        onclick="changeImage('<?php echo e(asset('storage/' . $image->file_path)); ?>', this)">
+                                        <img src="<?php echo e(asset('storage/' . $image->file_path)); ?>" alt="<?php echo e($product->name); ?>">
                                     </div>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
                         </div>
-                    @endif
+                    <?php endif; ?>
                 </div>
             </div>
 
             <div class="col-lg-6">
                 <!-- Product Info -->
                 <div class="product-info card border-0 shadow-sm p-3 p-md-4">
-                    <h1 class="product-main-title mb-2 fw-bold lh-sm">{{ $product->name }}
-                        @if ($product->created_at > \Carbon\Carbon::now()->subDays(30))
+                    <h1 class="product-main-title mb-2 fw-bold lh-sm"><?php echo e($product->name); ?>
+
+                        <?php if($product->created_at > \Carbon\Carbon::now()->subDays(30)): ?>
                             <span class="badge bg-success align-middle">NEW</span>
-                        @endif
+                        <?php endif; ?>
                     </h1>
 
-                    @php
+                    <?php
                         $allFiveStars = $product->ratings->count() > 0
                             && $product->ratings->every(fn ($review) => (int) $review->rating === 5);
                         $averageRating = $allFiveStars
                             ? 5.0
                             : round((float) ($product->ratings->avg('rating') ?? 0), 1);
                         $totalReviews = $product->ratings->count();
-                    @endphp
-                    @if ($averageRating > 0)
+                    ?>
+                    <?php if($averageRating > 0): ?>
                         <div class="product-rating">
                             <div class="stars">
-                                @for ($i = 1; $i <= 5; $i++)
-                                    @php
+                                <?php for($i = 1; $i <= 5; $i++): ?>
+                                    <?php
                                         $starValue = $averageRating - ($i - 1);
-                                    @endphp
-                                    <i class="bi {{ $starValue >= 1 ? 'bi-star-fill' : ($starValue >= 0.5 ? 'bi-star-half' : 'bi-star') }} star"></i>
-                                @endfor
+                                    ?>
+                                    <i class="bi <?php echo e($starValue >= 1 ? 'bi-star-fill' : ($starValue >= 0.5 ? 'bi-star-half' : 'bi-star')); ?> star"></i>
+                                <?php endfor; ?>
                             </div>
-                            <span class="rating-text">{{ number_format($averageRating, 1) }} ({{ $totalReviews }} reviews)</span>
+                            <span class="rating-text"><?php echo e(number_format($averageRating, 1)); ?> (<?php echo e($totalReviews); ?> reviews)</span>
                         </div>
-                    @endif
+                    <?php endif; ?>
 
                     <div class="product-prices align-items-center">
-                        <span class="current-price fw-bold">Tsh {{ number_format((float) $product->new_price, 0) }}</span>
-                        @if ($product->old_price && $product->old_price > $product->new_price)
-                            <span class="old-price text-danger">Tsh {{ number_format((float) $product->old_price, 0) }}</span>
-                            <span class="badge bg-danger badge-sm">{{ $product->discount }}% OFF</span>
-                        @endif
+                        <span class="current-price fw-bold">Tsh <?php echo e(number_format((float) $product->new_price, 0)); ?></span>
+                        <?php if($product->old_price && $product->old_price > $product->new_price): ?>
+                            <span class="old-price text-danger">Tsh <?php echo e(number_format((float) $product->old_price, 0)); ?></span>
+                            <span class="badge bg-danger badge-sm"><?php echo e($product->discount); ?>% OFF</span>
+                        <?php endif; ?>
                     </div>
 
                     <div class="stock-qty-row">
                         <div
-                            class="stock-info {{ $product->stock > 10 ? 'stock-in' : ($product->stock > 0 ? 'stock-low' : 'stock-out') }}">
+                            class="stock-info <?php echo e($product->stock > 10 ? 'stock-in' : ($product->stock > 0 ? 'stock-low' : 'stock-out')); ?>">
                             <i class="bi bi-circle-fill"></i>
-                            @if ($product->stock > 10)
-                                <span>In Stock ({{ $product->stock }} available)</span>
-                            @elseif($product->stock > 0)
-                                <span>Only {{ $product->stock }} left in stock</span>
-                            @else
+                            <?php if($product->stock > 10): ?>
+                                <span>In Stock (<?php echo e($product->stock); ?> available)</span>
+                            <?php elseif($product->stock > 0): ?>
+                                <span>Only <?php echo e($product->stock); ?> left in stock</span>
+                            <?php else: ?>
                                 <span>Out of Stock</span>
-                            @endif
+                            <?php endif; ?>
                         </div>
 
                         <div class="quantity-selector">
                             <div class="quantity-input">
-                                <button class="quantity-btn" onclick="changeQuantity(-1)" {{ $product->stock <= 0 ? 'disabled' : '' }}>-</button>
-                                <input type="number" id="quantityInput" value="{{ $product->stock > 0 ? 1 : 0 }}" min="1"
-                                    max="{{ $product->stock }}" readonly>
-                                <button class="quantity-btn" onclick="changeQuantity(1)" {{ $product->stock <= 0 ? 'disabled' : '' }}>+</button>
+                                <button class="quantity-btn" onclick="changeQuantity(-1)" <?php echo e($product->stock <= 0 ? 'disabled' : ''); ?>>-</button>
+                                <input type="number" id="quantityInput" value="<?php echo e($product->stock > 0 ? 1 : 0); ?>" min="1"
+                                    max="<?php echo e($product->stock); ?>" readonly>
+                                <button class="quantity-btn" onclick="changeQuantity(1)" <?php echo e($product->stock <= 0 ? 'disabled' : ''); ?>>+</button>
                             </div>
                         </div>
                     </div>
 
                     <!-- ✅ CATEGORY INFO IN PRODUCT HEADER -->
-                    @php
+                    <?php
                         $category = $product->category;
                         $parentName = $category?->parent?->name ?? null;
                         $groupName = $category?->category_group ?? null;
                         $tags = $category?->tags ?? [];
-                    @endphp
-                    @if($category)
+                    ?>
+                    <?php if($category): ?>
                         <div class="product-category-info">
                             <span class="badge badge-category-main">
-                                <i class="bi bi-tag me-1"></i>{{ $category->name }}
+                                <i class="bi bi-tag me-1"></i><?php echo e($category->name); ?>
+
                             </span>
-                            @if($parentName)
+                            <?php if($parentName): ?>
                                 <span class="badge badge-parent-main">
-                                    <i class="bi bi-diagram-3 me-1"></i>{{ $parentName }}
+                                    <i class="bi bi-diagram-3 me-1"></i><?php echo e($parentName); ?>
+
                                 </span>
-                            @endif
-                            @if($groupName && $groupName !== 'Other')
+                            <?php endif; ?>
+                            <?php if($groupName && $groupName !== 'Other'): ?>
                                 <span class="badge badge-group-main">
-                                    <i class="bi bi-grid me-1"></i>{{ $groupName }}
+                                    <i class="bi bi-grid me-1"></i><?php echo e($groupName); ?>
+
                                 </span>
-                            @endif
-                            @if(!empty($tags) && is_array($tags))
-                                @foreach(array_slice($tags, 0, 3) as $tag)
+                            <?php endif; ?>
+                            <?php if(!empty($tags) && is_array($tags)): ?>
+                                <?php $__currentLoopData = array_slice($tags, 0, 3); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tag): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <span class="badge badge-tags-main">
-                                        <i class="bi bi-tag me-1"></i>{{ $tag }}
+                                        <i class="bi bi-tag me-1"></i><?php echo e($tag); ?>
+
                                     </span>
-                                @endforeach
-                                @if(count($tags) > 3)
-                                    <span class="badge badge-tags-main">+{{ count($tags) - 3 }}</span>
-                                @endif
-                            @endif
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                <?php if(count($tags) > 3): ?>
+                                    <span class="badge badge-tags-main">+<?php echo e(count($tags) - 3); ?></span>
+                                <?php endif; ?>
+                            <?php endif; ?>
                         </div>
-                    @endif
+                    <?php endif; ?>
 
                     <div class="action-buttons row g-2">
                         <div class="col-12">
                         <button class="btn-add-cart w-100 show-dot-btn"
-                            {{ $product->stock <= 0 ? 'disabled' : '' }}
-                            onclick="addToCart({{ $product->id }}, document.getElementById('quantityInput').value)">
+                            <?php echo e($product->stock <= 0 ? 'disabled' : ''); ?>
+
+                            onclick="addToCart(<?php echo e($product->id); ?>, document.getElementById('quantityInput').value)">
                             <span class="btn-dot-spinner d-none" aria-hidden="true"><span></span><span></span><span></span></span>
-                            <span class="button-text"><i class="bi bi-cart-plus"></i> {{ $product->stock <= 0 ? 'Out of Stock' : 'Add to Cart' }}</span>
+                            <span class="button-text"><i class="bi bi-cart-plus"></i> <?php echo e($product->stock <= 0 ? 'Out of Stock' : 'Add to Cart'); ?></span>
                         </button>
                         </div>
-                        @auth
+                        <?php if(auth()->guard()->check()): ?>
                             <div class="col-12">
                             <button type="button" class="btn btn-outline-secondary w-100 show-dot-btn" onclick="openRatingModal()">
                                 <span class="btn-dot-spinner d-none" aria-hidden="true"><span></span><span></span><span></span></span>
@@ -590,7 +596,7 @@
                                 </span>
                             </button>
                             </div>
-                        @else
+                        <?php else: ?>
                             <div class="col-12">
                             <button type="button" class="btn btn-outline-secondary w-100 show-dot-btn" onclick="openRatingModal()">
                                 <span class="btn-dot-spinner d-none" aria-hidden="true"><span></span><span></span><span></span></span>
@@ -601,7 +607,7 @@
                                 </span>
                             </button>
                             </div>
-                        @endauth
+                        <?php endif; ?>
                     </div>
 
 
@@ -629,16 +635,18 @@
             <div id="description" class="tab-content active">
                 <h4>About this product</h4>
                 <div class="prose">
-                    {!! $product->description->description ?? '<p>No description available.</p>' !!}
-                    {!! $product->description->details ?? '' !!}
+                    <?php echo $product->description->description ?? '<p>No description available.</p>'; ?>
+
+                    <?php echo $product->description->details ?? ''; ?>
+
                 </div>
             </div>
 
             <div id="specifications" class="tab-content">
                 <h4>Technical Specifications</h4>
                 <div class="prose">
-                    @if ($product->description && $product->description->specifications)
-                        @php
+                    <?php if($product->description && $product->description->specifications): ?>
+                        <?php
                             $specs = trim($product->description->specifications);
                             $lines = array_filter(explode("\n", $specs), function ($line) {
                                 return trim($line) !== '';
@@ -661,94 +669,95 @@
                             } else {
                                 echo '<p>No specifications available.</p>';
                             }
-                        @endphp
-                    @else
+                        ?>
+                    <?php else: ?>
                         <p>No specifications available.</p>
-                    @endif
+                    <?php endif; ?>
                 </div>
             </div>
 
             <div id="reviews" class="tab-content">
                 <div class="reviews-heading">
                     <h4>Customer Reviews</h4>
-                    @if ($totalReviews > 0)
+                    <?php if($totalReviews > 0): ?>
                         <div class="reviews-heading-meta">
-                            <span class="reviews-score">{{ number_format($averageRating, 1) }}</span>
+                            <span class="reviews-score"><?php echo e(number_format($averageRating, 1)); ?></span>
                             <div class="reviews-stars-inline">
-                                @for ($i = 1; $i <= 5; $i++)
-                                    <i class="bi {{ $i <= round($averageRating) ? 'bi-star-fill' : 'bi-star' }}"></i>
-                                @endfor
+                                <?php for($i = 1; $i <= 5; $i++): ?>
+                                    <i class="bi <?php echo e($i <= round($averageRating) ? 'bi-star-fill' : 'bi-star'); ?>"></i>
+                                <?php endfor; ?>
                             </div>
-                            <span class="reviews-count">{{ $totalReviews }} reviews</span>
+                            <span class="reviews-count"><?php echo e($totalReviews); ?> reviews</span>
                         </div>
-                    @endif
+                    <?php endif; ?>
                 </div>
-                @if ($product->ratings->count() > 0)
+                <?php if($product->ratings->count() > 0): ?>
                     <div class="reviews-carousel-container">
                         <div class="css-carousel" id="cssReviewsCarousel">
-                            <div class="css-carousel-track" style="--total-slides: {{ $product->ratings->count() }}">
-                                @foreach ($product->ratings as $index => $rating)
+                            <div class="css-carousel-track" style="--total-slides: <?php echo e($product->ratings->count()); ?>">
+                                <?php $__currentLoopData = $product->ratings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $rating): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <div class="css-carousel-slide">
                                         <div class="review-item">
                                             <div class="review-item-head">
                                                 <div class="review-user">
                                                     <div class="review-avatar">
-                                                        {{ strtoupper(substr($rating->user->name ?? 'U', 0, 1)) }}
+                                                        <?php echo e(strtoupper(substr($rating->user->name ?? 'U', 0, 1))); ?>
+
                                                     </div>
                                                     <div class="review-user-meta">
-                                                        <strong class="review-author">{{ $rating->user->name }}</strong>
+                                                        <strong class="review-author"><?php echo e($rating->user->name); ?></strong>
                                                         <small class="review-date">
                                                             <i class="bi bi-calendar3"></i>
-                                                            <span>{{ $rating->created_at->format('M d, Y') }}</span>
+                                                            <span><?php echo e($rating->created_at->format('M d, Y')); ?></span>
                                                         </small>
                                                     </div>
                                                 </div>
                                                 <div class="review-rating-summary">
                                                     <div class="stars review-stars">
-                                                        @for ($i = 1; $i <= 5; $i++)
+                                                        <?php for($i = 1; $i <= 5; $i++): ?>
                                                             <i
-                                                                class="bi {{ $i <= $rating->rating ? 'bi-star-fill' : 'bi-star' }} star"></i>
-                                                        @endfor
+                                                                class="bi <?php echo e($i <= $rating->rating ? 'bi-star-fill' : 'bi-star'); ?> star"></i>
+                                                        <?php endfor; ?>
                                                     </div>
-                                                    <span class="review-rating-badge">{{ number_format((float) $rating->rating, 1) }}/5</span>
+                                                    <span class="review-rating-badge"><?php echo e(number_format((float) $rating->rating, 1)); ?>/5</span>
                                                 </div>
                                             </div>
-                                            @if ($rating->review)
+                                            <?php if($rating->review): ?>
                                                 <blockquote class="review-quote">
-                                                    <p>{{ $rating->review }}</p>
+                                                    <p><?php echo e($rating->review); ?></p>
                                                 </blockquote>
-                                            @else
+                                            <?php else: ?>
                                                 <p class="review-empty">No review text provided</p>
-                                            @endif
+                                            <?php endif; ?>
                                         </div>
                                     </div>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
                         </div>
 
 
                     </div>
-                @else
+                <?php else: ?>
                     <div class="text-center py-4">
                         <i class="bi bi-star text-muted" style="font-size: 3rem;"></i>
                         <p class="text-muted mt-2">No reviews yet. Be the first to rate this product!</p>
                     </div>
-                @endif
+                <?php endif; ?>
             </div>
         </div>
 
         <!-- ============================================ -->
         <!-- 1. FREQUENTLY BOUGHT TOGETHER (Complementary) -->
         <!-- ============================================ -->
-        @if (!empty($complementaryProducts) && count($complementaryProducts) > 0)
+        <?php if(!empty($complementaryProducts) && count($complementaryProducts) > 0): ?>
             <section class="related-products complementary-products-section">
                 <h2 class="related-title">
                     <i class="bi bi-basket3 me-2"></i>Frequently Bought Together
                 </h2>
                 <p class="text-muted small mb-3">Customers who bought this also bought these</p>
                 <div class="products-grid">
-                    @foreach ($complementaryProducts as $compProduct)
-                        @php
+                    <?php $__currentLoopData = $complementaryProducts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $compProduct): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php
                             if (is_array($compProduct) && isset($compProduct['product'])) {
                                 $compProduct = $compProduct['product'];
                             }
@@ -756,115 +765,122 @@
                             $compParentName = $compCategory?->parent?->name ?? null;
                             $compGroupName = $compCategory?->category_group ?? null;
                             $compTags = $compCategory?->tags ?? [];
-                        @endphp
-                        @if($compProduct)
+                        ?>
+                        <?php if($compProduct): ?>
                             <article class="product-card">
                                 <div class="product-image">
-                                    <a href="{{ route('shop.show', ['public_id' => $compProduct->public_id, 'slug' => $compProduct->slug]) }}" class="text-decoration-none">
-                                        <img src="{{ $compProduct->thumbnail ? asset('storage/' . $compProduct->thumbnail) : asset('img/logo.png') }}"
-                                            alt="{{ $compProduct->name }}" loading="lazy">
+                                    <a href="<?php echo e(route('shop.show', ['public_id' => $compProduct->public_id, 'slug' => $compProduct->slug])); ?>" class="text-decoration-none">
+                                        <img src="<?php echo e($compProduct->thumbnail ? asset('storage/' . $compProduct->thumbnail) : asset('img/logo.png')); ?>"
+                                            alt="<?php echo e($compProduct->name); ?>" loading="lazy">
                                     </a>
                                     <div class="product-badges">
-                                        @if($compProduct->created_at->diffInDays(now()) <= 7)
+                                        <?php if($compProduct->created_at->diffInDays(now()) <= 7): ?>
                                             <span class="product-badge badge-new">New</span>
-                                        @endif
+                                        <?php endif; ?>
                                         <span class="product-badge badge-complementary">🛒 Bought Together</span>
-                                        @if($compParentName)
-                                            <span class="product-badge badge-parent">{{ $compParentName }}</span>
-                                        @endif
-                                        @if($compGroupName && $compGroupName !== 'Other')
-                                            <span class="product-badge badge-group">{{ $compGroupName }}</span>
-                                        @endif
+                                        <?php if($compParentName): ?>
+                                            <span class="product-badge badge-parent"><?php echo e($compParentName); ?></span>
+                                        <?php endif; ?>
+                                        <?php if($compGroupName && $compGroupName !== 'Other'): ?>
+                                            <span class="product-badge badge-group"><?php echo e($compGroupName); ?></span>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
 
                                 <div class="product-info">
                                     <h3 class="product-title">
-                                        <a href="{{ route('shop.show', ['public_id' => $compProduct->public_id, 'slug' => $compProduct->slug]) }}" class="text-decoration-none">
-                                            {{ $compProduct->name }}
+                                        <a href="<?php echo e(route('shop.show', ['public_id' => $compProduct->public_id, 'slug' => $compProduct->slug])); ?>" class="text-decoration-none">
+                                            <?php echo e($compProduct->name); ?>
+
                                         </a>
                                     </h3>
 
-                                    @if($compProduct->description?->description)
+                                    <?php if($compProduct->description?->description): ?>
                                         <p class="product-description">
-                                            {{ Str::limit($compProduct->description->description, 60) }}
+                                            <?php echo e(Str::limit($compProduct->description->description, 60)); ?>
+
                                         </p>
-                                    @endif
+                                    <?php endif; ?>
 
                                     <div class="product-prices">
-                                        <span class="product-price">Tsh {{ number_format((float) $compProduct->new_price, 0) }}</span>
-                                        @if($compProduct->old_price && $compProduct->old_price > $compProduct->new_price)
-                                            <span class="product-old-price">Tsh {{ number_format((float) $compProduct->old_price, 0) }}</span>
-                                        @endif
+                                        <span class="product-price">Tsh <?php echo e(number_format((float) $compProduct->new_price, 0)); ?></span>
+                                        <?php if($compProduct->old_price && $compProduct->old_price > $compProduct->new_price): ?>
+                                            <span class="product-old-price">Tsh <?php echo e(number_format((float) $compProduct->old_price, 0)); ?></span>
+                                        <?php endif; ?>
                                     </div>
 
                                     <div class="product-rating">
                                         <div class="stars">
-                                            @for($i = 1; $i <= 5; $i++)
-                                                @if($compProduct->rate > 0)
-                                                    <i class="bi {{ $i <= round($compProduct->rate) ? 'bi-star-fill' : 'bi-star' }} star"></i>
-                                                @else
+                                            <?php for($i = 1; $i <= 5; $i++): ?>
+                                                <?php if($compProduct->rate > 0): ?>
+                                                    <i class="bi <?php echo e($i <= round($compProduct->rate) ? 'bi-star-fill' : 'bi-star'); ?> star"></i>
+                                                <?php else: ?>
                                                     <i class="bi bi-star star text-secondary"></i>
-                                                @endif
-                                            @endfor
+                                                <?php endif; ?>
+                                            <?php endfor; ?>
                                         </div>
-                                        <span class="rating-count">({{ number_format((float) $compProduct->rate, 1) }})</span>
-                                        <span class="stock-status {{ $compProduct->stock > 10 ? 'stock-in' : ($compProduct->stock > 0 ? 'stock-low' : 'stock-out') }}">
-                                            @if($compProduct->stock > 10)
+                                        <span class="rating-count">(<?php echo e(number_format((float) $compProduct->rate, 1)); ?>)</span>
+                                        <span class="stock-status <?php echo e($compProduct->stock > 10 ? 'stock-in' : ($compProduct->stock > 0 ? 'stock-low' : 'stock-out')); ?>">
+                                            <?php if($compProduct->stock > 10): ?>
                                                 In Stock
-                                            @elseif($compProduct->stock > 0)
-                                                Only {{ $compProduct->stock }} left
-                                            @else
+                                            <?php elseif($compProduct->stock > 0): ?>
+                                                Only <?php echo e($compProduct->stock); ?> left
+                                            <?php else: ?>
                                                 Out of Stock
-                                            @endif
+                                            <?php endif; ?>
                                         </span>
                                     </div>
 
                                     <div class="product-meta">
                                         <span class="category">
-                                            <i class="bi bi-tag-fill"></i> {{ $compCategory->name ?? 'Uncategorized' }}
+                                            <i class="bi bi-tag-fill"></i> <?php echo e($compCategory->name ?? 'Uncategorized'); ?>
+
                                         </span>
                                     </div>
                                     <!-- ✅ Category Info Row -->
                                     <div class="category-info-row">
-                                        @if($compParentName)
+                                        <?php if($compParentName): ?>
                                             <span class="badge badge-parent">
-                                                <i class="bi bi-diagram-3 me-1"></i>{{ $compParentName }}
+                                                <i class="bi bi-diagram-3 me-1"></i><?php echo e($compParentName); ?>
+
                                             </span>
-                                        @endif
-                                        @if($compGroupName && $compGroupName !== 'Other')
+                                        <?php endif; ?>
+                                        <?php if($compGroupName && $compGroupName !== 'Other'): ?>
                                             <span class="badge badge-group">
-                                                <i class="bi bi-grid me-1"></i>{{ $compGroupName }}
+                                                <i class="bi bi-grid me-1"></i><?php echo e($compGroupName); ?>
+
                                             </span>
-                                        @endif
-                                        @if(!empty($compTags) && is_array($compTags))
-                                            @foreach(array_slice($compTags, 0, 2) as $tag)
+                                        <?php endif; ?>
+                                        <?php if(!empty($compTags) && is_array($compTags)): ?>
+                                            <?php $__currentLoopData = array_slice($compTags, 0, 2); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tag): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <span class="badge badge-tags">
-                                                    <i class="bi bi-tag me-1"></i>{{ $tag }}
+                                                    <i class="bi bi-tag me-1"></i><?php echo e($tag); ?>
+
                                                 </span>
-                                            @endforeach
-                                            @if(count($compTags) > 2)
-                                                <span class="badge badge-tags">+{{ count($compTags) - 2 }}</span>
-                                            @endif
-                                        @endif
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                            <?php if(count($compTags) > 2): ?>
+                                                <span class="badge badge-tags">+<?php echo e(count($compTags) - 2); ?></span>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </article>
-                        @endif
-                    @endforeach
+                        <?php endif; ?>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
             </section>
-        @endif
+        <?php endif; ?>
 
         <!-- ============================================ -->
         <!-- 2. AI RECOMMENDATIONS (Similar Products) -->
         <!-- ============================================ -->
-        @if (!empty($aiRecommendations) && count($aiRecommendations) > 0)
+        <?php if(!empty($aiRecommendations) && count($aiRecommendations) > 0): ?>
             <section class="related-products category-related-products" id="ai-related-section">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <h2 class="related-title mb-0">
                         <i class="bi bi-robot me-2"></i>
-                        {{ $hasOrderHistory ? 'Recommended Products' : 'You May Also Like' }}
+                        <?php echo e($hasOrderHistory ? 'Recommended Products' : 'You May Also Like'); ?>
+
                     </h2>
                     <span class="badge bg-info text-white small">
                         <i class="bi bi-robot me-1"></i>AI Powered
@@ -872,11 +888,12 @@
                 </div>
                 <p class="text-muted small mb-3">
                     <i class="bi bi-lightbulb me-1"></i>
-                    {{ $hasOrderHistory ? 'Based on your purchase history' : 'Similar products from the same category' }}
+                    <?php echo e($hasOrderHistory ? 'Based on your purchase history' : 'Similar products from the same category'); ?>
+
                 </p>
                 <div class="products-grid ai-products-grid">
-                    @foreach ($aiRecommendations as $rec)
-                        @php
+                    <?php $__currentLoopData = $aiRecommendations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $rec): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php
                             $aiProduct = $rec['product'] ?? null;
                             $confidence = $rec['confidence'] ?? 0;
                             $source = $rec['source'] ?? 'general';
@@ -899,224 +916,239 @@
                             $aiParentName = $aiCategory?->parent?->name ?? null;
                             $aiGroupName = $aiCategory?->category_group ?? null;
                             $aiTags = $aiCategory?->tags ?? [];
-                        @endphp
-                        @if($aiProduct)
+                        ?>
+                        <?php if($aiProduct): ?>
                             <div class="product-card ai-product-card">
                                 <div class="product-image">
-                                    <a href="{{ route('shop.show', ['public_id' => $aiProduct->public_id, 'slug' => $aiProduct->slug]) }}" class="text-decoration-none">
-                                        <img src="{{ $aiProduct->thumbnail ? asset('storage/' . $aiProduct->thumbnail) : asset('img/logo.png') }}"
-                                            alt="{{ $aiProduct->name }}" loading="lazy">
+                                    <a href="<?php echo e(route('shop.show', ['public_id' => $aiProduct->public_id, 'slug' => $aiProduct->slug])); ?>" class="text-decoration-none">
+                                        <img src="<?php echo e($aiProduct->thumbnail ? asset('storage/' . $aiProduct->thumbnail) : asset('img/logo.png')); ?>"
+                                            alt="<?php echo e($aiProduct->name); ?>" loading="lazy">
                                     </a>
                                     <div class="product-badges">
-                                        @if($aiProduct->created_at->diffInDays(now()) <= 7)
+                                        <?php if($aiProduct->created_at->diffInDays(now()) <= 7): ?>
                                             <span class="product-badge badge-new">New</span>
-                                        @endif
-                                        @if($confidence > 0.7)
+                                        <?php endif; ?>
+                                        <?php if($confidence > 0.7): ?>
                                             <span class="product-badge badge-recommended">★ Recommended</span>
-                                        @endif
-                                        <span class="product-badge badge-category">{{ $aiCategoryName }}</span>
-                                        @if($aiParentName)
-                                            <span class="product-badge badge-parent">{{ $aiParentName }}</span>
-                                        @endif
-                                        @if($aiGroupName && $aiGroupName !== 'Other')
-                                            <span class="product-badge badge-group">{{ $aiGroupName }}</span>
-                                        @endif
+                                        <?php endif; ?>
+                                        <span class="product-badge badge-category"><?php echo e($aiCategoryName); ?></span>
+                                        <?php if($aiParentName): ?>
+                                            <span class="product-badge badge-parent"><?php echo e($aiParentName); ?></span>
+                                        <?php endif; ?>
+                                        <?php if($aiGroupName && $aiGroupName !== 'Other'): ?>
+                                            <span class="product-badge badge-group"><?php echo e($aiGroupName); ?></span>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
 
                                 <div class="product-info">
                                     <h3 class="product-title">
-                                        <a href="{{ route('shop.show', ['public_id' => $aiProduct->public_id, 'slug' => $aiProduct->slug]) }}" class="text-decoration-none">
-                                            {{ $aiProduct->name }}
+                                        <a href="<?php echo e(route('shop.show', ['public_id' => $aiProduct->public_id, 'slug' => $aiProduct->slug])); ?>" class="text-decoration-none">
+                                            <?php echo e($aiProduct->name); ?>
+
                                         </a>
                                     </h3>
 
-                                    @if($aiProduct->description?->description)
+                                    <?php if($aiProduct->description?->description): ?>
                                         <p class="product-description">
-                                            {{ Str::limit($aiProduct->description->description, 60) }}
+                                            <?php echo e(Str::limit($aiProduct->description->description, 60)); ?>
+
                                         </p>
-                                    @endif
+                                    <?php endif; ?>
 
                                     <div class="product-prices">
-                                        <span class="product-price">Tsh {{ number_format((float) $aiProduct->new_price, 0) }}</span>
-                                        @if($aiProduct->old_price && $aiProduct->old_price > $aiProduct->new_price)
-                                            <span class="product-old-price">Tsh {{ number_format((float) $aiProduct->old_price, 0) }}</span>
-                                        @endif
+                                        <span class="product-price">Tsh <?php echo e(number_format((float) $aiProduct->new_price, 0)); ?></span>
+                                        <?php if($aiProduct->old_price && $aiProduct->old_price > $aiProduct->new_price): ?>
+                                            <span class="product-old-price">Tsh <?php echo e(number_format((float) $aiProduct->old_price, 0)); ?></span>
+                                        <?php endif; ?>
                                     </div>
 
                                     <div class="product-rating">
                                         <div class="stars">
-                                            @for($i = 1; $i <= 5; $i++)
-                                                @if($aiProduct->rate > 0)
-                                                    <i class="bi {{ $i <= round($aiProduct->rate) ? 'bi-star-fill' : 'bi-star' }} star"></i>
-                                                @else
+                                            <?php for($i = 1; $i <= 5; $i++): ?>
+                                                <?php if($aiProduct->rate > 0): ?>
+                                                    <i class="bi <?php echo e($i <= round($aiProduct->rate) ? 'bi-star-fill' : 'bi-star'); ?> star"></i>
+                                                <?php else: ?>
                                                     <i class="bi bi-star star text-secondary"></i>
-                                                @endif
-                                            @endfor
+                                                <?php endif; ?>
+                                            <?php endfor; ?>
                                         </div>
-                                        <span class="rating-count">({{ number_format((float) $aiProduct->rate, 1) }})</span>
-                                        <span class="stock-status {{ $aiProduct->stock > 10 ? 'stock-in' : ($aiProduct->stock > 0 ? 'stock-low' : 'stock-out') }}">
-                                            @if($aiProduct->stock > 10)
+                                        <span class="rating-count">(<?php echo e(number_format((float) $aiProduct->rate, 1)); ?>)</span>
+                                        <span class="stock-status <?php echo e($aiProduct->stock > 10 ? 'stock-in' : ($aiProduct->stock > 0 ? 'stock-low' : 'stock-out')); ?>">
+                                            <?php if($aiProduct->stock > 10): ?>
                                                 In Stock
-                                            @elseif($aiProduct->stock > 0)
-                                                Only {{ $aiProduct->stock }} left
-                                            @else
+                                            <?php elseif($aiProduct->stock > 0): ?>
+                                                Only <?php echo e($aiProduct->stock); ?> left
+                                            <?php else: ?>
                                                 Out of Stock
-                                            @endif
+                                            <?php endif; ?>
                                         </span>
                                     </div>
 
                                     <div class="product-meta">
                                         <span class="category">
-                                            <i class="bi bi-tag-fill"></i> {{ $aiCategoryName }}
+                                            <i class="bi bi-tag-fill"></i> <?php echo e($aiCategoryName); ?>
+
                                         </span>
                                         <span class="recommendation-tag small text-muted">
-                                            <i class="bi bi-info-circle"></i> {{ $sourceLabel }}
+                                            <i class="bi bi-info-circle"></i> <?php echo e($sourceLabel); ?>
+
                                         </span>
                                     </div>
                                     <!-- ✅ Category Info Row -->
                                     <div class="category-info-row">
-                                        @if($aiParentName)
+                                        <?php if($aiParentName): ?>
                                             <span class="badge badge-parent">
-                                                <i class="bi bi-diagram-3 me-1"></i>{{ $aiParentName }}
+                                                <i class="bi bi-diagram-3 me-1"></i><?php echo e($aiParentName); ?>
+
                                             </span>
-                                        @endif
-                                        @if($aiGroupName && $aiGroupName !== 'Other')
+                                        <?php endif; ?>
+                                        <?php if($aiGroupName && $aiGroupName !== 'Other'): ?>
                                             <span class="badge badge-group">
-                                                <i class="bi bi-grid me-1"></i>{{ $aiGroupName }}
+                                                <i class="bi bi-grid me-1"></i><?php echo e($aiGroupName); ?>
+
                                             </span>
-                                        @endif
-                                        @if(!empty($aiTags) && is_array($aiTags))
-                                            @foreach(array_slice($aiTags, 0, 2) as $tag)
+                                        <?php endif; ?>
+                                        <?php if(!empty($aiTags) && is_array($aiTags)): ?>
+                                            <?php $__currentLoopData = array_slice($aiTags, 0, 2); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tag): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <span class="badge badge-tags">
-                                                    <i class="bi bi-tag me-1"></i>{{ $tag }}
+                                                    <i class="bi bi-tag me-1"></i><?php echo e($tag); ?>
+
                                                 </span>
-                                            @endforeach
-                                            @if(count($aiTags) > 2)
-                                                <span class="badge badge-tags">+{{ count($aiTags) - 2 }}</span>
-                                            @endif
-                                        @endif
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                            <?php if(count($aiTags) > 2): ?>
+                                                <span class="badge badge-tags">+<?php echo e(count($aiTags) - 2); ?></span>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>
-                        @endif
-                    @endforeach
+                        <?php endif; ?>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
             </section>
-        @endif
+        <?php endif; ?>
 
         <!-- ============================================ -->
         <!-- 3. RELATED PRODUCTS (Category-based fallback) -->
         <!-- ============================================ -->
-        @if ($relatedProducts->count() > 0)
+        <?php if($relatedProducts->count() > 0): ?>
             <section class="related-products category-related-products">
                 <h2 class="related-title">
                     <i class="bi bi-tags me-2"></i>Related Products
                 </h2>
                 <p class="text-muted small mb-3">More products from this category</p>
                 <div class="products-grid">
-                    @foreach ($relatedProducts as $relatedProduct)
-                        @php
+                    <?php $__currentLoopData = $relatedProducts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $relatedProduct): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php
                             $relCategory = $relatedProduct->category ?? null;
                             $relParentName = $relCategory?->parent?->name ?? null;
                             $relGroupName = $relCategory?->category_group ?? null;
                             $relTags = $relCategory?->tags ?? [];
-                        @endphp
+                        ?>
                         <article class="product-card">
                             <div class="product-image">
-                                <a href="{{ route('shop.show', ['public_id' => $relatedProduct->public_id, 'slug' => $relatedProduct->slug]) }}" class="text-decoration-none">
-                                    <img src="{{ $relatedProduct->thumbnail ? asset('storage/' . $relatedProduct->thumbnail) : asset('img/logo.png') }}"
-                                        alt="{{ $relatedProduct->name }}" loading="lazy">
+                                <a href="<?php echo e(route('shop.show', ['public_id' => $relatedProduct->public_id, 'slug' => $relatedProduct->slug])); ?>" class="text-decoration-none">
+                                    <img src="<?php echo e($relatedProduct->thumbnail ? asset('storage/' . $relatedProduct->thumbnail) : asset('img/logo.png')); ?>"
+                                        alt="<?php echo e($relatedProduct->name); ?>" loading="lazy">
                                 </a>
                                 <div class="product-badges">
-                                    @if($relatedProduct->created_at->diffInDays(now()) <= 7)
+                                    <?php if($relatedProduct->created_at->diffInDays(now()) <= 7): ?>
                                         <span class="product-badge badge-new">New</span>
-                                    @endif
-                                    @if($relParentName)
-                                        <span class="product-badge badge-parent">{{ $relParentName }}</span>
-                                    @endif
-                                    @if($relGroupName && $relGroupName !== 'Other')
-                                        <span class="product-badge badge-group">{{ $relGroupName }}</span>
-                                    @endif
+                                    <?php endif; ?>
+                                    <?php if($relParentName): ?>
+                                        <span class="product-badge badge-parent"><?php echo e($relParentName); ?></span>
+                                    <?php endif; ?>
+                                    <?php if($relGroupName && $relGroupName !== 'Other'): ?>
+                                        <span class="product-badge badge-group"><?php echo e($relGroupName); ?></span>
+                                    <?php endif; ?>
                                 </div>
                             </div>
 
                             <div class="product-info">
                                 <h3 class="product-title">
-                                    <a href="{{ route('shop.show', ['public_id' => $relatedProduct->public_id, 'slug' => $relatedProduct->slug]) }}" class="text-decoration-none">
-                                        {{ $relatedProduct->name }}
+                                    <a href="<?php echo e(route('shop.show', ['public_id' => $relatedProduct->public_id, 'slug' => $relatedProduct->slug])); ?>" class="text-decoration-none">
+                                        <?php echo e($relatedProduct->name); ?>
+
                                     </a>
                                 </h3>
 
-                                @if($relatedProduct->description?->description)
+                                <?php if($relatedProduct->description?->description): ?>
                                     <p class="product-description">
-                                        {{ Str::limit($relatedProduct->description->description, 60) }}
+                                        <?php echo e(Str::limit($relatedProduct->description->description, 60)); ?>
+
                                     </p>
-                                @endif
+                                <?php endif; ?>
 
                                 <div class="product-prices">
-                                    <span class="product-price">Tsh {{ number_format((float) $relatedProduct->new_price, 0) }}</span>
-                                    @if($relatedProduct->old_price && $relatedProduct->old_price > $relatedProduct->new_price)
-                                        <span class="product-old-price">Tsh {{ number_format((float) $relatedProduct->old_price, 0) }}</span>
-                                    @endif
+                                    <span class="product-price">Tsh <?php echo e(number_format((float) $relatedProduct->new_price, 0)); ?></span>
+                                    <?php if($relatedProduct->old_price && $relatedProduct->old_price > $relatedProduct->new_price): ?>
+                                        <span class="product-old-price">Tsh <?php echo e(number_format((float) $relatedProduct->old_price, 0)); ?></span>
+                                    <?php endif; ?>
                                 </div>
 
                                 <div class="product-rating">
                                     <div class="stars">
-                                        @for($i = 1; $i <= 5; $i++)
-                                            @if($relatedProduct->rate > 0)
-                                                <i class="bi {{ $i <= round($relatedProduct->rate) ? 'bi-star-fill' : 'bi-star' }} star"></i>
-                                            @else
+                                        <?php for($i = 1; $i <= 5; $i++): ?>
+                                            <?php if($relatedProduct->rate > 0): ?>
+                                                <i class="bi <?php echo e($i <= round($relatedProduct->rate) ? 'bi-star-fill' : 'bi-star'); ?> star"></i>
+                                            <?php else: ?>
                                                 <i class="bi bi-star star text-secondary"></i>
-                                            @endif
-                                        @endfor
+                                            <?php endif; ?>
+                                        <?php endfor; ?>
                                     </div>
-                                    <span class="rating-count">({{ number_format((float) $relatedProduct->rate, 1) }})</span>
-                                    <span class="stock-status {{ $relatedProduct->stock > 10 ? 'stock-in' : ($relatedProduct->stock > 0 ? 'stock-low' : 'stock-out') }}">
-                                        @if($relatedProduct->stock > 10)
-                                            In Stock: {{ $relatedProduct->stock }}
-                                        @elseif($relatedProduct->stock > 0)
-                                            In Stock: {{ $relatedProduct->stock }}
-                                        @else
+                                    <span class="rating-count">(<?php echo e(number_format((float) $relatedProduct->rate, 1)); ?>)</span>
+                                    <span class="stock-status <?php echo e($relatedProduct->stock > 10 ? 'stock-in' : ($relatedProduct->stock > 0 ? 'stock-low' : 'stock-out')); ?>">
+                                        <?php if($relatedProduct->stock > 10): ?>
+                                            In Stock: <?php echo e($relatedProduct->stock); ?>
+
+                                        <?php elseif($relatedProduct->stock > 0): ?>
+                                            In Stock: <?php echo e($relatedProduct->stock); ?>
+
+                                        <?php else: ?>
                                             Out of Stock
-                                        @endif
+                                        <?php endif; ?>
                                     </span>
                                 </div>
 
                                 <div class="product-meta">
                                     <span class="category">
-                                        <i class="bi bi-tag-fill"></i> {{ $relCategory->name ?? 'Uncategorized' }}
+                                        <i class="bi bi-tag-fill"></i> <?php echo e($relCategory->name ?? 'Uncategorized'); ?>
+
                                     </span>
                                 </div>
                                 <!-- ✅ Category Info Row -->
                                 <div class="category-info-row">
-                                    @if($relParentName)
+                                    <?php if($relParentName): ?>
                                         <span class="badge badge-parent">
-                                            <i class="bi bi-diagram-3 me-1"></i>{{ $relParentName }}
+                                            <i class="bi bi-diagram-3 me-1"></i><?php echo e($relParentName); ?>
+
                                         </span>
-                                    @endif
-                                    @if($relGroupName && $relGroupName !== 'Other')
+                                    <?php endif; ?>
+                                    <?php if($relGroupName && $relGroupName !== 'Other'): ?>
                                         <span class="badge badge-group">
-                                            <i class="bi bi-grid me-1"></i>{{ $relGroupName }}
+                                            <i class="bi bi-grid me-1"></i><?php echo e($relGroupName); ?>
+
                                         </span>
-                                    @endif
-                                    @if(!empty($relTags) && is_array($relTags))
-                                        @foreach(array_slice($relTags, 0, 2) as $tag)
+                                    <?php endif; ?>
+                                    <?php if(!empty($relTags) && is_array($relTags)): ?>
+                                        <?php $__currentLoopData = array_slice($relTags, 0, 2); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tag): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                             <span class="badge badge-tags">
-                                                <i class="bi bi-tag me-1"></i>{{ $tag }}
+                                                <i class="bi bi-tag me-1"></i><?php echo e($tag); ?>
+
                                             </span>
-                                        @endforeach
-                                        @if(count($relTags) > 2)
-                                            <span class="badge badge-tags">+{{ count($relTags) - 2 }}</span>
-                                        @endif
-                                    @endif
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                        <?php if(count($relTags) > 2): ?>
+                                            <span class="badge badge-tags">+<?php echo e(count($relTags) - 2); ?></span>
+                                        <?php endif; ?>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </article>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </div>
             </section>
-        @endif
+        <?php endif; ?>
     </div>
     </div>
 
@@ -1131,17 +1163,17 @@
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{ route('shop.rate', ['public_id' => $product->public_id, 'slug' => $product->slug]) }}" method="POST">
-                    @csrf
+                <form action="<?php echo e(route('shop.rate', ['public_id' => $product->public_id, 'slug' => $product->slug])); ?>" method="POST">
+                    <?php echo csrf_field(); ?>
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Your Rating</label>
                             <div class="rating-stars">
-                                @for ($i = 1; $i <= 5; $i++)
-                                    <input type="radio" id="star{{ $i }}" name="rating"
-                                        value="{{ $i }}" class="d-none" required>
-                                    <label for="star{{ $i }}" class="bi bi-star-fill star-rating"></label>
-                                @endfor
+                                <?php for($i = 1; $i <= 5; $i++): ?>
+                                    <input type="radio" id="star<?php echo e($i); ?>" name="rating"
+                                        value="<?php echo e($i); ?>" class="d-none" required>
+                                    <label for="star<?php echo e($i); ?>" class="bi bi-star-fill star-rating"></label>
+                                <?php endfor; ?>
                             </div>
                         </div>
                         <div class="mb-3">
@@ -1163,7 +1195,7 @@
         </div>
     </div>
 
-    @php
+    <?php
         $currentUserRole = auth()->check() ? auth()->user()->role : null;
         $currentUserDashboardUrl = route('login');
         if (auth()->check()) {
@@ -1173,22 +1205,23 @@
                 default => route('customer.dashboard'),
             };
         }
-    @endphp
+    ?>
     <script>
-        window.productId = {{ $product->id }};
-        window.productPublicId = @json($product->public_id);
-        window.productSlug = @json($product->slug);
-        window.productViewActivityUrl = @json(route('shop.view.activity', ['public_id' => $product->public_id, 'slug' => $product->slug]));
-        window.currentUserRole = @json($currentUserRole);
-        window.currentUserEmailVerified = @json(auth()->check() && auth()->user()->hasVerifiedEmail());
-        window.currentUserDashboardUrl = @json($currentUserDashboardUrl);
+        window.productId = <?php echo e($product->id); ?>;
+        window.productPublicId = <?php echo json_encode($product->public_id, 15, 512) ?>;
+        window.productSlug = <?php echo json_encode($product->slug, 15, 512) ?>;
+        window.productViewActivityUrl = <?php echo json_encode(route('shop.view.activity', ['public_id' => $product->public_id, 'slug' => $product->slug])) ?>;
+        window.currentUserRole = <?php echo json_encode($currentUserRole, 15, 512) ?>;
+        window.currentUserEmailVerified = <?php echo json_encode(auth()->check() && auth()->user()->hasVerifiedEmail(), 15, 512) ?>;
+        window.currentUserDashboardUrl = <?php echo json_encode($currentUserDashboardUrl, 15, 512) ?>;
     </script>
 
-    {{-- script section --}}
-@section('scripts')
-    <script src="{{ asset('js/show.js') }}"></script>
-    <script src="{{ asset('js/show-rating.js') }}"></script>
-    <script src="{{ asset('js/ai-recommendations.js') }}"></script>
-@endsection
+    
+<?php $__env->startSection('scripts'); ?>
+    <script src="<?php echo e(asset('js/show.js')); ?>"></script>
+    <script src="<?php echo e(asset('js/show-rating.js')); ?>"></script>
+    <script src="<?php echo e(asset('js/ai-recommendations.js')); ?>"></script>
+<?php $__env->stopSection(); ?>
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\recommendation_system_logic\resources\views/shop/show.blade.php ENDPATH**/ ?>

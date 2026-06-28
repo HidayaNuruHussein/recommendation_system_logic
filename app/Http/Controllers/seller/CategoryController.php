@@ -10,14 +10,19 @@ use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
-    // Display all categories
     public function index(Request $request)
     {
         $categories = Category::query()
             ->withCount('products')
+            ->with(['parent', 'children'])
             ->orderBy('name')
             ->paginate(12)
             ->withQueryString();
+
+        // ✅ Get ALL categories for dropdown (including sub-categories)
+        $allCategories = Category::with('parent')
+            ->orderBy('name')
+            ->get();
 
         if ($request->ajax()) {
             return response()->json([
@@ -27,15 +32,19 @@ class CategoryController extends Controller
             ]);
         }
 
-        return view('seller.categories', compact('categories'));
+        // ✅ Pass both $categories and $allCategories to view
+        return view('seller.categories', compact('categories', 'allCategories'));
     }
 
-    // Store a new category
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:191|unique:categories,name',
             'description' => 'nullable|string',
+            'parent_id' => 'nullable|exists:categories,id',
+            'category_group' => 'nullable|string|max:100',
+            'tags' => 'nullable|array',
+            'tags.*' => 'string|max:50',
         ]);
 
         if ($validator->fails()) {
@@ -50,12 +59,15 @@ class CategoryController extends Controller
                 'name' => $request->name,
                 'slug' => Str::slug($request->name),
                 'description' => $request->description,
+                'parent_id' => $request->parent_id,
+                'category_group' => $request->category_group ?? 'Other',
+                'tags' => $request->tags ?? ['general'],
             ]);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Category created successfully!',
-                'category' => $category->load('products')->loadCount('products'),
+                'category' => $category->load(['products', 'parent', 'children'])->loadCount('products'),
             ]);
 
         } catch (\Exception $e) {
@@ -66,10 +78,10 @@ class CategoryController extends Controller
         }
     }
 
-    // Show category details
     public function show($id)
     {
-        $category = Category::with('products')->withCount('products')
+        $category = Category::with(['products', 'parent', 'children'])
+            ->withCount('products')
             ->wherePublicIdOrId($id)
             ->first();
 
@@ -83,10 +95,10 @@ class CategoryController extends Controller
         return response()->json([
             'success' => true,
             'category' => $category,
+            'related_categories' => $category->getRelatedCategoryIds(),
         ]);
     }
 
-    // Update category
     public function update(Request $request, $id)
     {
         $category = Category::wherePublicIdOrId($id)->first();
@@ -98,10 +110,23 @@ class CategoryController extends Controller
             ], 404);
         }
 
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:191|unique:categories,name,'.$id,
+        // ✅ Build validation rules dynamically
+        $rules = [
             'description' => 'nullable|string',
-        ]);
+            'parent_id' => 'nullable|exists:categories,id',
+            'category_group' => 'nullable|string|max:100',
+            'tags' => 'nullable|array',
+            'tags.*' => 'string|max:50',
+        ];
+
+        // ✅ Only check unique if name has changed
+        if ($request->name !== $category->name) {
+            $rules['name'] = 'required|string|max:191|unique:categories,name';
+        } else {
+            $rules['name'] = 'required|string|max:191';
+        }
+
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             return response()->json([
@@ -115,12 +140,15 @@ class CategoryController extends Controller
                 'name' => $request->name,
                 'slug' => Str::slug($request->name),
                 'description' => $request->description,
+                'parent_id' => $request->parent_id,
+                'category_group' => $request->category_group ?? $category->category_group,
+                'tags' => $request->tags ?? $category->tags,
             ]);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Category updated successfully!',
-                'category' => $category->load('products')->loadCount('products'),
+                'category' => $category->load(['products', 'parent', 'children'])->loadCount('products'),
             ]);
 
         } catch (\Exception $e) {
@@ -131,7 +159,6 @@ class CategoryController extends Controller
         }
     }
 
-    // Delete category
     public function destroy($id)
     {
         $category = Category::withCount('products')
@@ -145,11 +172,17 @@ class CategoryController extends Controller
             ], 404);
         }
 
-        // Check if category has products
         if ($category->products_count > 0) {
             return response()->json([
                 'success' => false,
                 'message' => 'Cannot delete category that contains products. Please remove all products first.',
+            ], 422);
+        }
+
+        if ($category->children()->count() > 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot delete category that has sub-categories. Please remove sub-categories first.',
             ], 422);
         }
 
@@ -167,5 +200,18 @@ class CategoryController extends Controller
                 'message' => 'Failed to delete category: '.$e->getMessage(),
             ], 500);
         }
+    }
+
+    public function getHierarchy()
+    {
+        $categories = Category::with(['children'])
+            ->whereNull('parent_id')
+            ->orderBy('name')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'categories' => $categories,
+        ]);
     }
 }

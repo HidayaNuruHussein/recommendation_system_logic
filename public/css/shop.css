@@ -1273,3 +1273,47 @@ for any non-commercial educational purpose. See LICENSE.md.
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
+
+
+/* AI Recommendation Badges */
+.badge-recommended {
+    background: linear-gradient(135deg, #f7971e, #ffd200);
+    color: #000;
+    font-size: 0.6rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.badge-info {
+    background: #0dcaf0;
+    color: #000;
+    font-size: 0.65rem;
+    padding: 3px 10px;
+    border-radius: 20px;
+}
+
+/* Recommendation Tag */
+.recommendation-tag {
+    font-size: 0.65rem;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.recommendation-tag i {
+    font-size: 0.6rem;
+}
+
+/* Product meta with recommendation tag */
+.product-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid #f0f0f0;
+}

@@ -16,18 +16,24 @@ class OrderSeeder extends Seeder
         $products = Product::where('stock', '>', 0)->get();
         $customers = User::where('role', 'customer')->get();
 
-        if ($products->count() < 2 || $customers->isEmpty()) {
+        // Angalia kama kuna products na customers za kutosha
+        if ($products->count() < 1 || $customers->isEmpty()) {
             return;
         }
 
         foreach ($customers->take(2) as $index => $customer) {
-            $orderProducts = $products->random(rand(4, 6));
+            // Badilisha hapa - tumia products zote zilizopo ikiwa ni chache
+            $maxItems = min($products->count(), 6);
+            $minItems = min($products->count(), 2);
+            $itemCount = rand($minItems, $maxItems);
+            
+            $orderProducts = $products->random($itemCount);
             $subtotal = 0;
             $orderItemsData = [];
 
             foreach ($orderProducts as $product) {
                 $quantity = rand(1, 2);
-                $unitPrice = $product->new_price ?? $product->old_price ?? 1000;
+                $unitPrice = $product->new_price ?? 1000;
                 $totalPrice = $unitPrice * $quantity;
                 $subtotal += $totalPrice;
 
