@@ -1,15 +1,10 @@
-{{--
-SOURCE CODE OWNER: HAGAI HAROLD NGOBEY
-hngobey@gmail.com | +255 765 384 905
-Provided to assist students. Students may study, modify, and reuse it
-for any non-commercial educational purpose. See LICENSE.md.
---}}
-@extends('layouts.shop')
 
-@section('title', 'Checkout - KidsStore')
 
-@section('css')
-    <link rel="stylesheet" href="{{ asset('css/checkout.css') }}">
+
+<?php $__env->startSection('title', 'Checkout - KidsStore'); ?>
+
+<?php $__env->startSection('css'); ?>
+    <link rel="stylesheet" href="<?php echo e(asset('css/checkout.css')); ?>">
     <style>
         /* Payment Method Styles */
         .payment-method-option {
@@ -225,13 +220,13 @@ for any non-commercial educational purpose. See LICENSE.md.
             }
         }
     </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
-    @php
+<?php $__env->startSection('content'); ?>
+    <?php
         $headerSettings = \App\Models\SiteSetting::where('group', 'header')->pluck('value', 'key');
         $headerLogo = isset($headerSettings['header_logo']) ? asset($headerSettings['header_logo']) : asset('img/logo.png');
-    @endphp
+    ?>
 
     <main class="shop-container">
         <div class="row justify-content-center">
@@ -239,18 +234,18 @@ for any non-commercial educational purpose. See LICENSE.md.
                 <!-- Page Header -->
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h1 class="h2 mb-0 d-flex align-items-center gap-2" style="color: var(--teal-primary, #0d9488);">
-                        <img src="{{ $headerLogo }}" alt="KidsStore Logo"
+                        <img src="<?php echo e($headerLogo); ?>" alt="KidsStore Logo"
                             style="width: 36px; height: 36px; object-fit: contain; border-radius: 8px;">
                         <span>Order Details</span>
                     </h1>
-                    <a href="{{ route('cart.index') }}" class="btn btn-outline-secondary checkout-dot-btn checkout-desktop-action" data-spin-link="1">
+                    <a href="<?php echo e(route('cart.index')); ?>" class="btn btn-outline-secondary checkout-dot-btn checkout-desktop-action" data-spin-link="1">
                         <span class="btn-dot-spinner" aria-hidden="true"><span></span><span></span><span></span></span>
                         <span class="button-text"><i class="bi bi-arrow-left"></i> Back to Cart</span>
                     </a>
                 </div>
 
-                <form id="checkoutForm" action="{{ route('checkout.store') }}" method="POST" class="checkout-form">
-                    @csrf
+                <form id="checkoutForm" action="<?php echo e(route('checkout.store')); ?>" method="POST" class="checkout-form">
+                    <?php echo csrf_field(); ?>
 
                     <div class="row g-4">
                         <!-- Left Column - Customer Information Forms -->
@@ -268,30 +263,30 @@ for any non-commercial educational purpose. See LICENSE.md.
                                             <div class="col-md-6">
                                                 <label class="form-label">First Name *</label>
                                                 <input type="text" name="first_name" class="form-control form-control-lg"
-                                                    value="{{ old('first_name', $savedCheckoutInfo->first_name ?? '') }}" required>
+                                                    value="<?php echo e(old('first_name', $savedCheckoutInfo->first_name ?? '')); ?>" required>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Last Name *</label>
                                                 <input type="text" name="last_name" class="form-control form-control-lg"
-                                                    value="{{ old('last_name', $savedCheckoutInfo->last_name ?? '') }}" required>
+                                                    value="<?php echo e(old('last_name', $savedCheckoutInfo->last_name ?? '')); ?>" required>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Email Address *</label>
                                                 <input type="email" name="email" class="form-control form-control-lg"
-                                                    value="{{ $user->email ?? old('email') }}" required readonly>
+                                                    value="<?php echo e($user->email ?? old('email')); ?>" required readonly>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Phone Number *</label>
                                                 <input type="text" name="phone_number"
                                                     class="form-control form-control-lg" placeholder="+255XXXXXXXXX"
-                                                    value="{{ $checkoutPhoneNumber ?: old('phone_number') }}"
+                                                    value="<?php echo e($checkoutPhoneNumber ?: old('phone_number')); ?>"
                                                     maxlength="13" pattern="^\+255[0-9]{9}$" required readonly>
                                             </div>
                                             <div class="col-12">
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="checkbox" value="1"
                                                         id="saveRequiredInformation" name="save_required_information"
-                                                        {{ old('save_required_information', 1) ? 'checked' : '' }}>
+                                                        <?php echo e(old('save_required_information', 1) ? 'checked' : ''); ?>>
                                                     <label class="form-check-label" for="saveRequiredInformation">
                                                         Save Required Information for next checkout
                                                     </label>
@@ -350,71 +345,71 @@ for any non-commercial educational purpose. See LICENSE.md.
                                 <div class="card-body">
                                     <!-- Products -->
                                     <div class="mb-4" id="orderSummaryProducts">
-                                        @foreach ($cartItems as $item)
-                                            @if ($loop->index < 3)
+                                        <?php $__currentLoopData = $cartItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <?php if($loop->index < 3): ?>
                                                 <div class="product-item">
                                                     <div class="product-item-image-wrap">
-                                                        <img src="{{ $item->product->thumbnail
+                                                        <img src="<?php echo e($item->product->thumbnail
                                                             ? asset('storage/' . $item->product->thumbnail)
                                                             : ($item->product->media->where('is_primary', true)->first()
                                                                 ? asset('storage/' . $item->product->media->where('is_primary', true)->first()->file_path)
-                                                                : asset('img/logo.png')) }}"
-                                                            alt="{{ $item->product->name }}">
+                                                                : asset('img/logo.png'))); ?>"
+                                                            alt="<?php echo e($item->product->name); ?>">
                                                     </div>
                                                     <div class="product-item-content">
-                                                        <h6 class="product-item-title mb-1 text-truncate">{{ $item->product->name }}</h6>
-                                                        <p class="product-item-qty mb-0">Qty: {{ $item->quantity }}</p>
+                                                        <h6 class="product-item-title mb-1 text-truncate"><?php echo e($item->product->name); ?></h6>
+                                                        <p class="product-item-qty mb-0">Qty: <?php echo e($item->quantity); ?></p>
                                                     </div>
                                                     <div class="product-item-total text-end">
-                                                        <strong class="text-primary">{{ format_money_short($item->price * $item->quantity, 2) }}</strong>
+                                                        <strong class="text-primary"><?php echo e(format_money_short($item->price * $item->quantity, 2)); ?></strong>
                                                     </div>
                                                 </div>
-                                            @endif
-                                        @endforeach
+                                            <?php endif; ?>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-                                        @if ($cartItems->count() > 3)
+                                        <?php if($cartItems->count() > 3): ?>
                                             <div id="orderSummaryExtra" class="order-summary-extra" style="display: none;">
-                                                @foreach ($cartItems as $item)
-                                                    @if ($loop->index >= 3)
+                                                <?php $__currentLoopData = $cartItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                    <?php if($loop->index >= 3): ?>
                                                         <div class="product-item">
                                                             <div class="product-item-image-wrap">
-                                                                <img src="{{ $item->product->thumbnail
+                                                                <img src="<?php echo e($item->product->thumbnail
                                                                     ? asset('storage/' . $item->product->thumbnail)
                                                                     : ($item->product->media->where('is_primary', true)->first()
                                                                         ? asset('storage/' . $item->product->media->where('is_primary', true)->first()->file_path)
-                                                                        : asset('img/logo.png')) }}"
-                                                                    alt="{{ $item->product->name }}">
+                                                                        : asset('img/logo.png'))); ?>"
+                                                                    alt="<?php echo e($item->product->name); ?>">
                                                             </div>
                                                             <div class="product-item-content">
-                                                                <h6 class="product-item-title mb-1 text-truncate">{{ $item->product->name }}</h6>
-                                                                <p class="product-item-qty mb-0">Qty: {{ $item->quantity }}</p>
+                                                                <h6 class="product-item-title mb-1 text-truncate"><?php echo e($item->product->name); ?></h6>
+                                                                <p class="product-item-qty mb-0">Qty: <?php echo e($item->quantity); ?></p>
                                                             </div>
                                                             <div class="product-item-total text-end">
-                                                                <strong class="text-primary">{{ format_money_short($item->price * $item->quantity, 2) }}</strong>
+                                                                <strong class="text-primary"><?php echo e(format_money_short($item->price * $item->quantity, 2)); ?></strong>
                                                             </div>
                                                         </div>
-                                                    @endif
-                                                @endforeach
+                                                    <?php endif; ?>
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             </div>
 
                                             <button type="button" class="btn btn-link p-0 mt-2 summary-toggle-btn" id="orderSummaryToggleBtn"
-                                                data-expanded="false" data-hidden-count="{{ $cartItems->count() - 3 }}">
+                                                data-expanded="false" data-hidden-count="<?php echo e($cartItems->count() - 3); ?>">
                                                 <i class="bi bi-chevron-down" aria-hidden="true"></i>
-                                                <span>Show more ({{ $cartItems->count() - 3 }})</span>
+                                                <span>Show more (<?php echo e($cartItems->count() - 3); ?>)</span>
                                             </button>
-                                        @endif
+                                        <?php endif; ?>
                                     </div>
 
                                     <!-- Order Totals -->
                                     <div class="order-total">
                                         <div class="d-flex justify-content-between mb-2">
-                                            <span>Subtotal ({{ $cartItems->sum('quantity') }} items)</span>
-                                            <span>{{ format_money_short($subtotal, 2) }}</span>
+                                            <span>Subtotal (<?php echo e($cartItems->sum('quantity')); ?> items)</span>
+                                            <span><?php echo e(format_money_short($subtotal, 2)); ?></span>
                                         </div>
                                         <hr class="my-3">
                                         <div class="d-flex justify-content-between">
                                             <strong class="fs-5">Total</strong>
-                                            <strong class="total-amount fs-5">{{ format_money_short($total, 2) }}</strong>
+                                            <strong class="total-amount fs-5"><?php echo e(format_money_short($total, 2)); ?></strong>
                                         </div>
                                     </div>
 
@@ -433,7 +428,7 @@ for any non-commercial educational purpose. See LICENSE.md.
         </div>
 
         <div class="checkout-mobile-actions" aria-label="Mobile checkout actions">
-            <a href="{{ route('cart.index') }}" class="btn btn-outline-secondary checkout-dot-btn" data-spin-link="1">
+            <a href="<?php echo e(route('cart.index')); ?>" class="btn btn-outline-secondary checkout-dot-btn" data-spin-link="1">
                 <span class="btn-dot-spinner" aria-hidden="true"><span></span><span></span><span></span></span>
                 <span class="button-text"><i class="bi bi-arrow-left me-1"></i> Back to Cart</span>
             </a>
@@ -633,7 +628,7 @@ for any non-commercial educational purpose. See LICENSE.md.
                 }
                 
                 hidePaymentOverlay();
-                window.location.href = '{{ route('cart.index') }}';
+                window.location.href = '<?php echo e(route('cart.index')); ?>';
             }
         }
 
@@ -754,7 +749,7 @@ for any non-commercial educational purpose. See LICENSE.md.
                         if (data.redirect_url) {
                             window.location.href = data.redirect_url;
                         } else {
-                            window.location.href = '{{ route('customer.orders') }}';
+                            window.location.href = '<?php echo e(route('customer.orders')); ?>';
                         }
                     }, 2000);
                 } else {
@@ -824,8 +819,9 @@ for any non-commercial educational purpose. See LICENSE.md.
         });
     </script>
 
-@section('scripts')
-    {{-- Comment out the external checkout.js to avoid conflicts --}}
-    {{-- <script src="{{ asset('js/checkout.js') }}"></script> --}}
-@endsection
-@endsection
+<?php $__env->startSection('scripts'); ?>
+    
+    
+<?php $__env->stopSection(); ?>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.shop', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\recommendation_system_logic\resources\views/shop/checkout.blade.php ENDPATH**/ ?>

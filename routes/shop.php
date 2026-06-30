@@ -9,10 +9,6 @@ use App\Http\Controllers\Shop\OrderController;
 |--------------------------------------------------------------------------
 | Shop Routes
 |--------------------------------------------------------------------------
-|
-| Here are all the shop-related routes for customers
-| Cart, checkout, orders, etc.
-|
 */
 
 // Cart routes - Protected with auth and role middleware
@@ -29,11 +25,13 @@ Route::prefix('api/cart')->group(function () {
     Route::get('/count', [CartController::class, 'getCartCount'])->name('api.cart.count');
 });
 
-// Checkout routes
+// ✅ Checkout routes - FIXED: Use consistent parameter names
 Route::prefix('checkout')->middleware(['auth', 'role:customer'])->group(function () {
     Route::get('/', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/', [CheckoutController::class, 'store'])->name('checkout.store');
-    Route::get('/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
+    Route::get('/success/{orderId}', [CheckoutController::class, 'success'])->name('checkout.success');
+    Route::get('/failed/{orderId}', [CheckoutController::class, 'failed'])->name('checkout.failed');
+    Route::post('/retry/{orderId}', [CheckoutController::class, 'retry'])->name('checkout.retry');
 });
 
 // Order routes

@@ -27,6 +27,10 @@ class Order extends Model
         'estimated_delivery_date',
         'stock_deducted_at',
         'ordered_at',
+        // ✅ Customer fields
+        'customer_name',
+        'customer_email',
+        'customer_phone',
     ];
 
     protected $casts = [
@@ -74,6 +78,30 @@ class Order extends Model
     public function orderAddresses(): HasMany
     {
         return $this->hasMany(OrderAddress::class);
+    }
+
+    /**
+     * ✅ Relationship with Payments
+     */
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    /**
+     * ✅ Get latest payment
+     */
+    public function getLatestPaymentAttribute()
+    {
+        return $this->payments()->latest()->first();
+    }
+
+    /**
+     * ✅ Check if order is paid
+     */
+    public function getIsPaidAttribute()
+    {
+        return $this->status === 'completed' || $this->payments()->where('status', 'completed')->exists();
     }
 
     /**
@@ -161,5 +189,29 @@ class Order extends Model
     public function getFormattedTotalAttribute()
     {
         return $this->currency . ' ' . number_format($this->total_amount, 2);
+    }
+
+    /**
+     * ✅ Get customer full name
+     */
+    public function getCustomerFullNameAttribute()
+    {
+        return $this->customer_name ?? $this->user?->name ?? 'N/A';
+    }
+
+    /**
+     * ✅ Get customer email
+     */
+    public function getCustomerEmailAttribute()
+    {
+        return $this->customer_email ?? $this->user?->email ?? 'N/A';
+    }
+
+    /**
+     * ✅ Get customer phone
+     */
+    public function getCustomerPhoneAttribute()
+    {
+        return $this->customer_phone ?? $this->user?->phone_number ?? 'N/A';
     }
 }
