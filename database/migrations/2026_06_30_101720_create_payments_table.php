@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('transaction_id')->unique();
             $table->decimal('amount', 15, 2);
             $table->string('currency', 3)->default('TZS');
-            $table->string('payment_method', 50); // mpesa, bank, card, cash
+            $table->string('payment_method', 50); // mpesa, airtel_money, mixx_by_yas, halopesa, crdb, nmb, absa, tpb, visa, mastercard, american_express
             $table->string('phone_number', 20)->nullable();
             $table->string('email', 255)->nullable();
             $table->string('customer_name', 255)->nullable();

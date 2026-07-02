@@ -47036,3 +47036,42 @@ into your web browser: <span class="break-all" style="box-sizing: border-box; fo
 [2026-06-30 12:18:03] local.DEBUG: recommendForUser called {"user_id":6} 
 [2026-06-30 12:18:03] local.DEBUG: Preferred categories from orders {"user_id":6,"categories":[7,5]} 
 [2026-06-30 12:18:03] local.DEBUG: recommendForUser results {"user_id":6,"categories":[7,5],"count":3} 
+[2026-07-02 06:37:50] local.INFO: Attempting login for email: lyandorobetho@gmail.com  
+[2026-07-02 06:37:50] local.INFO: User exists with ID: 6, role: customer  
+[2026-07-02 06:37:51] local.INFO: Password matches: no  
+[2026-07-02 06:37:55] local.INFO: Attempting login for email: lyandorobetho@gmail.com  
+[2026-07-02 06:37:55] local.INFO: User exists with ID: 6, role: customer  
+[2026-07-02 06:37:56] local.INFO: Password matches: yes  
+[2026-07-02 06:37:56] local.INFO: Login successful for email: lyandorobetho@gmail.com  
+[2026-07-02 06:37:56] local.INFO: User role: customer  
+[2026-07-02 06:38:02] local.DEBUG: recommendForUser called {"user_id":6} 
+[2026-07-02 06:38:02] local.DEBUG: Preferred categories from orders {"user_id":6,"categories":[7,5]} 
+[2026-07-02 06:38:02] local.DEBUG: recommendForUser results {"user_id":6,"categories":[7,5],"count":3} 
+[2026-07-02 06:38:05] local.DEBUG: recommendByCategoryProximity called {"product_id":5,"limit":8} 
+[2026-07-02 06:38:05] local.DEBUG: Category details for proximity {"category_id":7,"category_name":"Computer Accessories","parent_id":null,"category_group":"Computers","tags":null} 
+[2026-07-02 06:38:05] local.DEBUG: Calculating category proximity {"category_id":7,"category_name":"Computer Accessories","parent_id":null,"category_group":"Computers","tags":null} 
+[2026-07-02 06:38:05] local.DEBUG: Added same group (HIGH PRIORITY) {"group":"Computers","categories":[4,5,29],"score":0.9} 
+[2026-07-02 06:38:05] local.DEBUG: Added child categories {"children":[4,5,19],"count":3,"score":0.8} 
+[2026-07-02 06:38:05] local.DEBUG: Added order affinity categories {"affinity":{"7":0.8},"score_range":"0.6 - 0.8"} 
+[2026-07-02 06:38:05] local.DEBUG: Category proximity calculated {"category_id":7,"category_name":"Computer Accessories","parent_id":null,"category_group":"Computers","proximity_count":5,"top_proximity":[1.0,0.9,0.9,0.9,0.8]} 
+[2026-07-02 06:38:05] local.DEBUG: Proximity categories found {"category_ids":[7,4,5,29,19],"proximity_scores":{"7":1.0,"4":0.9,"5":0.9,"29":0.9,"19":0.8}} 
+[2026-07-02 06:38:05] local.DEBUG: recommendByCategoryProximity results {"product_id":5,"category_id":7,"category_name":"Computer Accessories","parent_id":null,"category_group":"Computers","proximity_categories_count":5,"result_count":2} 
+[2026-07-02 06:38:05] local.DEBUG: fallbackGeneral called {"count":4} 
+[2026-07-02 07:06:28] local.DEBUG: recommendByCategoryProximity called {"product_id":4,"limit":8} 
+[2026-07-02 07:06:28] local.DEBUG: Category details for proximity {"category_id":7,"category_name":"Computer Accessories","parent_id":null,"category_group":"Computers","tags":null} 
+[2026-07-02 07:06:28] local.DEBUG: Calculating category proximity {"category_id":7,"category_name":"Computer Accessories","parent_id":null,"category_group":"Computers","tags":null} 
+[2026-07-02 07:06:28] local.DEBUG: Added same group (HIGH PRIORITY) {"group":"Computers","categories":[4,5,29],"score":0.9} 
+[2026-07-02 07:06:28] local.DEBUG: Added child categories {"children":[4,5,19],"count":3,"score":0.8} 
+[2026-07-02 07:06:28] local.DEBUG: Added order affinity categories {"affinity":{"7":0.8},"score_range":"0.6 - 0.8"} 
+[2026-07-02 07:06:28] local.DEBUG: Category proximity calculated {"category_id":7,"category_name":"Computer Accessories","parent_id":null,"category_group":"Computers","proximity_count":5,"top_proximity":[1.0,0.9,0.9,0.9,0.8]} 
+[2026-07-02 07:06:28] local.DEBUG: Proximity categories found {"category_ids":[7,4,5,29,19],"proximity_scores":{"7":1.0,"4":0.9,"5":0.9,"29":0.9,"19":0.8}} 
+[2026-07-02 07:06:28] local.DEBUG: recommendByCategoryProximity results {"product_id":4,"category_id":7,"category_name":"Computer Accessories","parent_id":null,"category_group":"Computers","proximity_categories_count":5,"result_count":2} 
+[2026-07-02 07:07:06] local.INFO: Checkout store started {"user_id":6} 
+[2026-07-02 07:07:06] local.ERROR: Checkout failed {"message":"preg_match(): No ending delimiter '/' found","file":"C:\\xampp\\htdocs\\recommendation_system_logic\\vendor\\laravel\\framework\\src\\Illuminate\\Validation\\Concerns\\ValidatesAttributes.php","line":2083} 
+[2026-07-02 07:09:27] local.INFO: Checkout store started {"user_id":6} 
+[2026-07-02 07:09:27] local.ERROR: Checkout failed {"message":"preg_match(): No ending delimiter '/' found","file":"C:\\xampp\\htdocs\\recommendation_system_logic\\vendor\\laravel\\framework\\src\\Illuminate\\Validation\\Concerns\\ValidatesAttributes.php","line":2083} 
+[2026-07-02 07:10:58] local.INFO: Checkout store started {"user_id":6} 
+[2026-07-02 07:10:59] local.INFO: Payment successful {"order_id":20} 
+[2026-07-02 07:11:01] local.DEBUG: recommendForUser called {"user_id":6} 
+[2026-07-02 07:11:01] local.DEBUG: Preferred categories from orders {"user_id":6,"categories":[7,5]} 
+[2026-07-02 07:11:01] local.DEBUG: recommendForUser results {"user_id":6,"categories":[7,5],"count":3} 

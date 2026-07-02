@@ -62,6 +62,137 @@
             border-color: #0d9488;
         }
 
+        /* Payment sub-options */
+        .payment-sub-options {
+            margin-top: 0.5rem;
+            padding: 0.5rem 0 0 1rem;
+            border-left: 2px solid #e9ecef;
+            display: none;
+        }
+
+        .payment-sub-options.active {
+            display: block;
+        }
+
+        .payment-sub-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            margin-bottom: 0.25rem;
+            border-radius: 8px;
+            transition: background 0.2s ease;
+            cursor: pointer;
+        }
+
+        .payment-sub-option:hover {
+            background: #f8f9fa;
+        }
+
+        .payment-sub-option input[type="radio"] {
+            margin-right: 0.5rem;
+        }
+
+        .payment-sub-option label {
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin: 0;
+            color: #212529;
+        }
+
+        .payment-sub-option .sub-icon {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Card Payment Fields */
+        .card-payment-fields {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+            display: none;
+        }
+
+        .card-payment-fields.active {
+            display: block;
+        }
+
+        .card-payment-fields .form-group {
+            margin-bottom: 0.75rem;
+        }
+
+        .card-payment-fields .form-label {
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: #495057;
+        }
+
+        .card-payment-fields .form-control {
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            padding: 0.6rem 0.75rem;
+            font-size: 0.95rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .card-payment-fields .form-control:focus {
+            border-color: #0d9488;
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+        }
+
+        .card-payment-fields .form-control.card-number {
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+
+        .card-payment-fields .card-icons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.25rem;
+        }
+
+        .card-payment-fields .card-icons img {
+            height: 30px;
+            opacity: 0.5;
+            transition: opacity 0.3s ease;
+        }
+
+        .card-payment-fields .card-icons img.active {
+            opacity: 1;
+        }
+
+        .card-payment-fields .card-hint {
+            font-size: 0.75rem;
+            color: #6c757d;
+            margin-top: 0.25rem;
+        }
+
+        /* Card number formatting */
+        .card-number-input {
+            position: relative;
+        }
+
+        .card-number-input .card-type-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+        }
+
+        /* Expiry and CVV row */
+        .expiry-cvv-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .expiry-cvv-row .form-group {
+            flex: 1;
+        }
+
         /* ============================================ */
         /* PAYMENT PROGRESS OVERLAY */
         /* ============================================ */
@@ -218,6 +349,13 @@
                 width: 48px;
                 height: 48px;
             }
+            .payment-sub-options {
+                padding-left: 0.5rem;
+            }
+            .expiry-cvv-row {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
         }
     </style>
 <?php $__env->stopSection(); ?>
@@ -295,34 +433,36 @@
                                         </div>
                                     </div>
 
-                                    <!-- ✅ PAYMENT METHOD SECTION -->
+                                    <!-- ✅ PAYMENT METHOD SECTION - UPDATED WITH CARD FIELDS -->
                                     <div class="mb-4">
-                                        <h6 class="section-title mb-3">Payment Method</h6>
-                                        <div class="row g-3">
+                                        <h6 class="section-title mb-3">Select Payment Method</h6>
+                                        
+                                        <!-- Payment Method Tabs -->
+                                        <div class="row g-2 mb-3">
                                             <div class="col-md-4">
                                                 <div class="payment-method-option">
-                                                    <input type="radio" name="payment_method" id="payment_mpesa" value="mpesa" checked>
-                                                    <label for="payment_mpesa" class="payment-method-label">
+                                                    <input type="radio" name="payment_category" id="category_mobile" value="mobile" checked onchange="togglePaymentSubOptions('mobile')">
+                                                    <label for="category_mobile" class="payment-method-label">
                                                         <i class="bi bi-phone"></i>
-                                                        <span>M-Pesa</span>
-                                                        <small>Pay using mobile money</small>
+                                                        <span>Mobile Money</span>
+                                                        <small>M-Pesa, Airtel, etc.</small>
                                                     </label>
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="payment-method-option">
-                                                    <input type="radio" name="payment_method" id="payment_bank" value="bank">
-                                                    <label for="payment_bank" class="payment-method-label">
+                                                    <input type="radio" name="payment_category" id="category_bank" value="bank" onchange="togglePaymentSubOptions('bank')">
+                                                    <label for="category_bank" class="payment-method-label">
                                                         <i class="bi bi-bank"></i>
                                                         <span>Bank Transfer</span>
-                                                        <small>Pay via mobile banking</small>
+                                                        <small>CRDB, NMB, etc.</small>
                                                     </label>
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="payment-method-option">
-                                                    <input type="radio" name="payment_method" id="payment_card" value="card">
-                                                    <label for="payment_card" class="payment-method-label">
+                                                    <input type="radio" name="payment_category" id="category_card" value="card" onchange="togglePaymentSubOptions('card')">
+                                                    <label for="category_card" class="payment-method-label">
                                                         <i class="bi bi-credit-card"></i>
                                                         <span>Card Payment</span>
                                                         <small>Visa / Mastercard</small>
@@ -330,10 +470,151 @@
                                                 </div>
                                             </div>
                                         </div>
+
+                                        <!-- Mobile Money Sub-options -->
+                                        <div id="mobile_sub_options" class="payment-sub-options active">
+                                            <div class="payment-sub-option">
+                                                <input type="radio" name="payment_method" id="payment_mpesa" value="mpesa" checked>
+                                                <label for="payment_mpesa">
+                                                    <span class="sub-icon">📱</span> M-Pesa
+                                                </label>
+                                            </div>
+                                            <div class="payment-sub-option">
+                                                <input type="radio" name="payment_method" id="payment_airtel" value="airtel_money">
+                                                <label for="payment_airtel">
+                                                    <span class="sub-icon">📱</span> Airtel Money
+                                                </label>
+                                            </div>
+                                            <div class="payment-sub-option">
+                                                <input type="radio" name="payment_method" id="payment_mixx" value="mixx_by_yas">
+                                                <label for="payment_mixx">
+                                                    <span class="sub-icon">📱</span> Mixx By Yas
+                                                </label>
+                                            </div>
+                                            <div class="payment-sub-option">
+                                                <input type="radio" name="payment_method" id="payment_halopesa" value="halopesa">
+                                                <label for="payment_halopesa">
+                                                    <span class="sub-icon">📱</span> HaloPesa
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Bank Sub-options -->
+                                        <div id="bank_sub_options" class="payment-sub-options">
+                                            <div class="payment-sub-option">
+                                                <input type="radio" name="payment_method" id="payment_crdb" value="crdb">
+                                                <label for="payment_crdb">
+                                                    <span class="sub-icon">🏦</span> CRDB Bank
+                                                </label>
+                                            </div>
+                                            <div class="payment-sub-option">
+                                                <input type="radio" name="payment_method" id="payment_nmb" value="nmb">
+                                                <label for="payment_nmb">
+                                                    <span class="sub-icon">🏦</span> NMB Bank
+                                                </label>
+                                            </div>
+                                            <div class="payment-sub-option">
+                                                <input type="radio" name="payment_method" id="payment_absa" value="absa">
+                                                <label for="payment_absa">
+                                                    <span class="sub-icon">🏦</span> ABSA Bank
+                                                </label>
+                                            </div>
+                                            <div class="payment-sub-option">
+                                                <input type="radio" name="payment_method" id="payment_tpb" value="tpb">
+                                                <label for="payment_tpb">
+                                                    <span class="sub-icon">🏦</span> TPB Bank
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Card Sub-options -->
+                                        <div id="card_sub_options" class="payment-sub-options">
+                                            <div class="payment-sub-option">
+                                                <input type="radio" name="payment_method" id="payment_visa" value="visa">
+                                                <label for="payment_visa">
+                                                    <span class="sub-icon">💳</span> Visa Card
+                                                </label>
+                                            </div>
+                                            <div class="payment-sub-option">
+                                                <input type="radio" name="payment_method" id="payment_mastercard" value="mastercard">
+                                                <label for="payment_mastercard">
+                                                    <span class="sub-icon">💳</span> Mastercard
+                                                </label>
+                                            </div>
+                                            <div class="payment-sub-option">
+                                                <input type="radio" name="payment_method" id="payment_american_express" value="american_express">
+                                                <label for="payment_american_express">
+                                                    <span class="sub-icon">💳</span> American Express
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <!-- ✅ CARD PAYMENT FIELDS -->
+                                        <div id="cardPaymentFields" class="card-payment-fields">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <div class="form-group">
+                                                        <label class="form-label">Card Number *</label>
+                                                        <div class="card-number-input">
+                                                            <input type="text" 
+                                                                name="card_number" 
+                                                                id="cardNumber"
+                                                                class="form-control card-number" 
+                                                                placeholder="1234 5678 9012 3456"
+                                                                maxlength="19"
+                                                                autocomplete="cc-number">
+                                                            <span class="card-type-icon" id="cardTypeIcon">💳</span>
+                                                        </div>
+                                                        <div class="card-icons">
+                                                            <span class="card-icon" data-card="visa">💳 Visa</span>
+                                                            <span class="card-icon" data-card="mastercard">💳 Mastercard</span>
+                                                            <span class="card-icon" data-card="amex">💳 Amex</span>
+                                                        </div>
+                                                        <div class="card-hint">Enter your card number without spaces</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="expiry-cvv-row">
+                                                <div class="form-group">
+                                                    <label class="form-label">Expiry Date *</label>
+                                                    <input type="text" 
+                                                        name="card_expiry" 
+                                                        id="cardExpiry"
+                                                        class="form-control" 
+                                                        placeholder="MM/YY"
+                                                        maxlength="5"
+                                                        autocomplete="cc-exp">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="form-label">CVV *</label>
+                                                    <input type="password" 
+                                                        name="card_cvv" 
+                                                        id="cardCvv"
+                                                        class="form-control" 
+                                                        placeholder="***"
+                                                        maxlength="4"
+                                                        autocomplete="cc-csc">
+                                                    <div class="card-hint">3 or 4 digits on back of card</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="form-label">Cardholder Name *</label>
+                                                <input type="text" 
+                                                    name="cardholder_name" 
+                                                    id="cardholderName"
+                                                    class="form-control" 
+                                                    placeholder="John Doe"
+                                                    autocomplete="cc-name">
+                                            </div>
+                                        </div>
+
+                                        <!-- Hidden field for selected payment method -->
+                                        <input type="hidden" name="selected_payment_method" id="selectedPaymentMethod" value="mpesa">
                                     </div>
                                 </div>
                             </div>
-
                         </div>
 
                         <!-- Right Column - Order Summary -->
@@ -470,6 +751,163 @@
 
     <script>
         // ============================================
+        // CARD NUMBER FORMATTING
+        // ============================================
+        function formatCardNumber(input) {
+            // Remove all non-digit characters
+            let value = input.value.replace(/\D/g, '');
+            
+            // Add spaces every 4 digits
+            let formatted = '';
+            for (let i = 0; i < value.length; i++) {
+                if (i > 0 && i % 4 === 0) {
+                    formatted += ' ';
+                }
+                formatted += value[i];
+            }
+            
+            input.value = formatted;
+            detectCardType(value);
+        }
+
+        function detectCardType(number) {
+            const icon = document.getElementById('cardTypeIcon');
+            const firstDigit = number.charAt(0);
+            const firstTwo = number.substring(0, 2);
+            const firstFour = number.substring(0, 4);
+            
+            // Visa
+            if (firstDigit === '4') {
+                icon.textContent = '💳 Visa';
+                icon.style.color = '#1a1f71';
+            }
+            // Mastercard
+            else if (firstTwo >= '51' && firstTwo <= '55') {
+                icon.textContent = '💳 Mastercard';
+                icon.style.color = '#eb001b';
+            }
+            // Amex
+            else if (firstTwo === '34' || firstTwo === '37') {
+                icon.textContent = '💳 Amex';
+                icon.style.color = '#006fcf';
+            }
+            // Discover
+            else if (firstFour === '6011' || firstTwo === '65') {
+                icon.textContent = '💳 Discover';
+                icon.style.color = '#ff6600';
+            }
+            else {
+                icon.textContent = '💳';
+                icon.style.color = '';
+            }
+        }
+
+        // ============================================
+        // EXPIRY DATE FORMATTING
+        // ============================================
+        function formatExpiry(input) {
+            let value = input.value.replace(/\D/g, '');
+            
+            if (value.length >= 2) {
+                // Add slash after month
+                let month = value.substring(0, 2);
+                let year = value.substring(2, 4);
+                
+                // Validate month
+                if (parseInt(month) > 12) {
+                    month = '12';
+                }
+                if (parseInt(month) < 1 && month.length === 2) {
+                    month = '01';
+                }
+                
+                value = month + (year ? '/' + year : '');
+            }
+            
+            input.value = value;
+        }
+
+        // ============================================
+        // CVV FORMATTING
+        // ============================================
+        function formatCvv(input) {
+            input.value = input.value.replace(/\D/g, '').substring(0, 4);
+        }
+
+        // ============================================
+        // PAYMENT CATEGORY TOGGLE
+        // ============================================
+        function togglePaymentSubOptions(category) {
+            // Hide all sub-options
+            document.getElementById('mobile_sub_options').classList.remove('active');
+            document.getElementById('bank_sub_options').classList.remove('active');
+            document.getElementById('card_sub_options').classList.remove('active');
+            
+            // Show selected category
+            if (category === 'mobile') {
+                document.getElementById('mobile_sub_options').classList.add('active');
+                document.getElementById('payment_mpesa').checked = true;
+                document.getElementById('selectedPaymentMethod').value = 'mpesa';
+                document.getElementById('cardPaymentFields').classList.remove('active');
+            } else if (category === 'bank') {
+                document.getElementById('bank_sub_options').classList.add('active');
+                document.getElementById('payment_crdb').checked = true;
+                document.getElementById('selectedPaymentMethod').value = 'crdb';
+                document.getElementById('cardPaymentFields').classList.remove('active');
+            } else if (category === 'card') {
+                document.getElementById('card_sub_options').classList.add('active');
+                document.getElementById('payment_visa').checked = true;
+                document.getElementById('selectedPaymentMethod').value = 'visa';
+                document.getElementById('cardPaymentFields').classList.add('active');
+            }
+        }
+
+        // Update hidden field when payment method changes
+        document.addEventListener('DOMContentLoaded', function() {
+            const paymentMethods = document.querySelectorAll('input[name="payment_method"]');
+            const hiddenField = document.getElementById('selectedPaymentMethod');
+            
+            paymentMethods.forEach(function(radio) {
+                radio.addEventListener('change', function() {
+                    if (this.checked) {
+                        hiddenField.value = this.value;
+                        // Show card fields if card payment method is selected
+                        const cardFields = document.getElementById('cardPaymentFields');
+                        if (this.value === 'visa' || this.value === 'mastercard' || this.value === 'american_express') {
+                            cardFields.classList.add('active');
+                        } else {
+                            cardFields.classList.remove('active');
+                        }
+                    }
+                });
+            });
+
+            // Card number input formatting
+            const cardNumberInput = document.getElementById('cardNumber');
+            if (cardNumberInput) {
+                cardNumberInput.addEventListener('input', function() {
+                    formatCardNumber(this);
+                });
+            }
+
+            // Expiry date formatting
+            const expiryInput = document.getElementById('cardExpiry');
+            if (expiryInput) {
+                expiryInput.addEventListener('input', function() {
+                    formatExpiry(this);
+                });
+            }
+
+            // CVV formatting
+            const cvvInput = document.getElementById('cardCvv');
+            if (cvvInput) {
+                cvvInput.addEventListener('input', function() {
+                    formatCvv(this);
+                });
+            }
+        });
+
+        // ============================================
         // OVERRIDE EXISTING CHECKOUT.JS FUNCTIONS
         // ============================================
         console.log('Checkout page loaded - OVERRIDE MODE');
@@ -602,7 +1040,7 @@
                 if (spinner) spinner.className = 'payment-spinner success';
                 if (title) {
                     title.className = 'payment-title success';
-                    title.textContent = 'Payment Successful!';
+                    title.textContent = '✅ Payment Successful!';
                 }
                 if (message) message.textContent = 'Your order has been confirmed. Redirecting...';
                 if (progressBar) progressBar.className = 'progress-bar-fill success';
@@ -610,7 +1048,7 @@
                 if (spinner) spinner.className = 'payment-spinner failed';
                 if (title) {
                     title.className = 'payment-title failed';
-                    title.textContent = 'Payment Failed';
+                    title.textContent = '❌ Payment Failed';
                 }
                 if (message) message.textContent = 'Payment failed. Please try again or use a different payment method.';
                 if (progressBar) progressBar.className = 'progress-bar-fill failed';
@@ -661,7 +1099,7 @@
         }
 
         // ============================================
-        // ✅ MAIN CONFIRM ORDER FUNCTION - UPDATED
+        // ✅ MAIN CONFIRM ORDER FUNCTION
         // ============================================
         function confirmOrder() {
             console.log('confirmOrder called - UPDATED VERSION');
@@ -673,6 +1111,21 @@
                 return;
             }
             
+            // Get the selected payment method from hidden field
+            const selectedPayment = document.getElementById('selectedPaymentMethod');
+            if (selectedPayment) {
+                // Add it to form data if not already present
+                const existingPayment = form.querySelector('input[name="payment_method"]:checked');
+                if (!existingPayment) {
+                    // Create hidden input if none exists
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = 'payment_method';
+                    hiddenInput.value = selectedPayment.value;
+                    form.appendChild(hiddenInput);
+                }
+            }
+            
             // Get form data
             const formData = new FormData(form);
             
@@ -681,13 +1134,48 @@
             const lastName = formData.get('last_name');
             const email = formData.get('email');
             const phone = formData.get('phone_number');
+            const paymentMethod = formData.get('payment_method');
             
             if (!firstName || !lastName || !email || !phone) {
                 alert('Please fill in all required fields.');
                 return;
             }
             
-            console.log('Form validation passed');
+            if (!paymentMethod) {
+                alert('Please select a payment method.');
+                return;
+            }
+            
+            // Validate card fields if card payment is selected
+            const cardMethods = ['visa', 'mastercard', 'american_express'];
+            if (cardMethods.includes(paymentMethod)) {
+                const cardNumber = formData.get('card_number');
+                const cardExpiry = formData.get('card_expiry');
+                const cardCvv = formData.get('card_cvv');
+                const cardholderName = formData.get('cardholder_name');
+                
+                if (!cardNumber || cardNumber.replace(/\s/g, '').length < 16) {
+                    alert('Please enter a valid card number.');
+                    return;
+                }
+                
+                if (!cardExpiry || cardExpiry.length < 5) {
+                    alert('Please enter a valid expiry date (MM/YY).');
+                    return;
+                }
+                
+                if (!cardCvv || cardCvv.length < 3) {
+                    alert('Please enter a valid CVV code.');
+                    return;
+                }
+                
+                if (!cardholderName || cardholderName.length < 2) {
+                    alert('Please enter the cardholder name.');
+                    return;
+                }
+            }
+            
+            console.log('Form validation passed', { paymentMethod });
             
             // Disable buttons
             const placeOrderBtn = document.getElementById('placeOrderBtn');
@@ -707,7 +1195,7 @@
                 if (paymentAbortController) {
                     paymentAbortController.abort();
                 }
-            }, 30000); // 30 second timeout
+            }, 30000);
             
             // Send AJAX request
             fetch(form.action, {
@@ -724,7 +1212,6 @@
                 clearTimeout(timeoutId);
                 console.log('Response status:', response.status);
                 
-                // Get response body as text first for debugging
                 return response.text().then(text => {
                     try {
                         return { 
@@ -742,28 +1229,24 @@
                 console.log('Response data:', data);
                 
                 if (data.success) {
-                    // ✅ Payment successful
                     completePayment(true);
                     setTimeout(() => {
                         hidePaymentOverlay();
                         if (data.redirect_url) {
                             window.location.href = data.redirect_url;
                         } else {
-                            window.location.href = '<?php echo e(route('customer.orders')); ?>';
+                            window.location.href = '<?php echo e(route('shop')); ?>';
                         }
                     }, 2000);
                 } else {
-                    // ❌ Payment failed - show error but keep cart
                     completePayment(false);
                     const msgEl = document.getElementById('paymentMessage');
                     if (msgEl) {
                         msgEl.textContent = data.message || 'Payment failed. Please try again.';
                     }
                     
-                    // Show retry button
                     showRetryButton();
                     
-                    // Enable buttons so user can retry
                     if (placeOrderBtn) placeOrderBtn.disabled = false;
                     if (placeOrderBtnMobile) placeOrderBtnMobile.disabled = false;
                 }
@@ -782,10 +1265,8 @@
                     }
                 }
                 
-                // Show retry button
                 showRetryButton();
                 
-                // Enable buttons
                 if (placeOrderBtn) placeOrderBtn.disabled = false;
                 if (placeOrderBtnMobile) placeOrderBtnMobile.disabled = false;
             });
@@ -796,7 +1277,6 @@
         // ============================================
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded - OVERRIDE MODE');
-            console.log('confirmOrder function type:', typeof confirmOrder);
             
             const toggleBtn = document.getElementById('orderSummaryToggleBtn');
             if (toggleBtn) {

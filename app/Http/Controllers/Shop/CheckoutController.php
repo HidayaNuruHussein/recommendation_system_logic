@@ -72,15 +72,27 @@ class CheckoutController extends Controller
             $digitsOnly = $this->normalizeTzPhoneToLocal9($rawPhone);
             $request->merge(['phone_number' => $digitsOnly]);
 
+            // ✅ FIXED: Using 'digits' instead of regex to avoid delimiter issues
+            $rules = [
+                'first_name' => 'required|string|max:255',
+                'last_name' => 'required|string|max:255',
+                'email' => 'required|email',
+                'phone_number' => 'required|string|digits:9', // ✅ No regex needed
+                'save_required_information' => 'nullable|boolean',
+                'payment_method' => 'required|string|in:mpesa,airtel_money,mixx_by_yas,halopesa,crdb,nmb,absa,tpb,visa,mastercard,american_express',
+            ];
+
+            // ✅ Add card validation if card payment is selected
+            $cardMethods = ['visa', 'mastercard', 'american_express'];
+            if (in_array($request->payment_method, $cardMethods)) {
+                $rules['card_number'] = 'required|string|min:16|max:19';
+                $rules['card_expiry'] = 'required|string|size:5'; // ✅ Simple size validation
+                $rules['card_cvv'] = 'required|string|min:3|max:4';
+                $rules['cardholder_name'] = 'required|string|min:2|max:255';
+            }
+
             try {
-                $request->validate([
-                    'first_name' => 'required|string|max:255',
-                    'last_name' => 'required|string|max:255',
-                    'email' => 'required|email',
-                    'phone_number' => 'required|string|regex:/^[0-9]{9}$/',
-                    'save_required_information' => 'nullable|boolean',
-                    'payment_method' => 'nullable|string|in:mpesa,bank,card',
-                ]);
+                $request->validate($rules);
             } catch (\Illuminate\Validation\ValidationException $e) {
                 return response()->json([
                     'success' => false,
@@ -171,7 +183,19 @@ class CheckoutController extends Controller
 
                 // ✅ 4. PROCESS PAYMENT SIMULATION
                 $paymentMethod = $request->input('payment_method', 'mpesa');
-                $paymentResult = $this->simulatePayment($order, $request, $paymentMethod);
+                
+                // ✅ Include card details if available
+                $cardDetails = null;
+                if (in_array($paymentMethod, ['visa', 'mastercard', 'american_express'])) {
+                    $cardDetails = [
+                        'card_number' => $this->maskCardNumber($request->input('card_number', '')),
+                        'card_expiry' => $request->input('card_expiry', ''),
+                        'cardholder_name' => $request->input('cardholder_name', ''),
+                        'card_type' => $paymentMethod,
+                    ];
+                }
+                
+                $paymentResult = $this->simulatePayment($order, $request, $paymentMethod, $cardDetails);
 
                 // ✅ 5. HANDLE PAYMENT RESULT
                 if ($paymentResult['success']) {
@@ -191,7 +215,6 @@ class CheckoutController extends Controller
                     
                     Log::info('Payment successful', ['order_id' => $order->id]);
                     
-                    // ✅ Redirect to shop page on success
                     return response()->json([
                         'success' => true,
                         'message' => 'Payment successful! Your order has been confirmed.',
@@ -200,8 +223,9 @@ class CheckoutController extends Controller
                             'transaction_id' => $paymentResult['transaction_id'],
                             'amount' => $paymentResult['amount'],
                             'status' => 'completed',
+                            'payment_method' => $paymentMethod,
                         ],
-                        'redirect_url' => route('shop') // Redirect to shop page
+                        'redirect_url' => route('shop')
                     ]);
                 } else {
                     // ✅ Payment failed
@@ -213,7 +237,6 @@ class CheckoutController extends Controller
                     
                     Log::warning('Payment failed', ['order_id' => $order->id]);
                     
-                    // ✅ Redirect to cart page on failure
                     return response()->json([
                         'success' => false,
                         'message' => $paymentResult['message'] ?? 'Payment failed. Please try again.',
@@ -222,9 +245,10 @@ class CheckoutController extends Controller
                             'transaction_id' => $paymentResult['transaction_id'],
                             'amount' => $paymentResult['amount'],
                             'status' => 'failed',
+                            'payment_method' => $paymentMethod,
                         ],
                         'cart_restored' => true,
-                        'redirect_url' => route('cart.index') // Redirect to cart page
+                        'redirect_url' => route('cart.index')
                     ], 400);
                 }
 
@@ -236,7 +260,6 @@ class CheckoutController extends Controller
                     'line' => $e->getLine(),
                 ]);
                 
-                // ✅ Redirect to cart on error
                 return response()->json([
                     'success' => false,
                     'message' => 'Failed to place order. Error: ' . $e->getMessage(),
@@ -251,7 +274,6 @@ class CheckoutController extends Controller
                 'line' => $e->getLine(),
             ]);
 
-            // ✅ Redirect to cart on error
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to place order. Error: ' . $e->getMessage(),
@@ -261,7 +283,28 @@ class CheckoutController extends Controller
     }
 
     /**
-     * ✅ PAYMENT SUCCESS PAGE (Keep for reference, but we're redirecting to shop)
+     * ✅ Mask card number for security
+     */
+    private function maskCardNumber($cardNumber)
+    {
+        // Remove spaces and non-digits
+        $clean = preg_replace('/\D/', '', $cardNumber);
+        $length = strlen($clean);
+        
+        if ($length <= 4) {
+            return $clean;
+        }
+        
+        // Show only last 4 digits
+        $last4 = substr($clean, -4);
+        $masked = str_repeat('*', $length - 4) . $last4;
+        
+        // Format with spaces every 4 digits
+        return implode(' ', str_split($masked, 4));
+    }
+
+    /**
+     * ✅ PAYMENT SUCCESS PAGE
      */
     public function success($orderId)
     {
@@ -288,7 +331,7 @@ class CheckoutController extends Controller
     }
 
     /**
-     * ✅ PAYMENT FAILED PAGE (Keep for reference, but we're redirecting to cart)
+     * ✅ PAYMENT FAILED PAGE
      */
     public function failed($orderId)
     {
@@ -357,10 +400,8 @@ class CheckoutController extends Controller
                 'status' => 'completed',
                 'stock_deducted_at' => now(),
             ]);
-            // Redirect to shop on success
             return redirect()->route('shop')->with('success', 'Payment successful! Your order has been confirmed.');
         } else {
-            // Redirect to cart on failure
             return redirect()->route('cart.index')->with('error', 'Payment failed. Please try again.');
         }
     }
@@ -381,9 +422,9 @@ class CheckoutController extends Controller
     }
 
     /**
-     * ✅ SIMULATE PAYMENT
+     * ✅ SIMULATE PAYMENT - Updated with card support
      */
-    private function simulatePayment($order, $request, $paymentMethod = 'mpesa')
+    private function simulatePayment($order, $request, $paymentMethod = 'mpesa', $cardDetails = null)
     {
         // Generate unique transaction ID
         $transactionId = 'TXN-' . date('Y') . '-' . strtoupper(uniqid());
@@ -396,7 +437,7 @@ class CheckoutController extends Controller
         // ✅ Simulate processing time (1-3 seconds)
         sleep(rand(1, 3));
 
-        // ✅ Payment data
+        // ✅ Build payment data
         $paymentData = [
             'order_id' => $order->id,
             'transaction_id' => $transactionId,
@@ -415,6 +456,16 @@ class CheckoutController extends Controller
             ],
             'paid_at' => $isSuccess ? now() : null,
         ];
+
+        // ✅ Add card details if available
+        if ($cardDetails) {
+            $paymentData['payment_data']['card_details'] = [
+                'card_type' => $cardDetails['card_type'] ?? $paymentMethod,
+                'card_number_masked' => $cardDetails['card_number'] ?? '****',
+                'card_expiry' => $cardDetails['card_expiry'] ?? '',
+                'cardholder_name' => $cardDetails['cardholder_name'] ?? '',
+            ];
+        }
 
         // ✅ Create payment record
         $payment = Payment::create($paymentData);
@@ -487,13 +538,14 @@ class CheckoutController extends Controller
     }
 
     /**
-     * Display phone as +255XXXXXXXXX
+     * Display phone as +255XXXXXXXXX - FIXED: No regex
      */
     private function formatTzPhoneForDisplay(?string $phone): string
     {
         $local9 = $this->normalizeTzPhoneToLocal9($phone);
 
-        if (!preg_match('/^[0-9]{9}$/', $local9)) {
+        // ✅ Simple validation without regex
+        if (strlen($local9) !== 9 || !ctype_digit($local9)) {
             return '';
         }
 
